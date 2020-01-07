@@ -1,13 +1,15 @@
 from tkinter import *
+from math import ceil
 from PIL import Image, ImageTk
 from solver import *
 
-def initialise(root):
+def initialise(root,transparent= False):
 	root.title('sudoku')
 	root.resizable(False, False)
 	root.minsize(453,435)
 	root.update_idletasks()
 	root.overrideredirect(True)
+	root.attributes('-alpha', 0.0) if transparent else None
 	width = root.winfo_width()
 	height = root.winfo_height()
 	x = (root.winfo_screenwidth() // 2) - (width // 2)
@@ -32,13 +34,20 @@ class board(object):
 		self.clicker.destroy()
 		self.master.update_idletasks()
 		self.master.overrideredirect(False)
-		self.master.bind('<Key>', quit)
+		# self.master.bind('<Key>', quit)
 		loc_x =event.x
 		loc_y = event.y
-		yposition = (loc_y/453) *9
-		xposition = (loc_x/435) *9
+		yposition = round((loc_y/453) *9)
+		xposition = ceil((loc_x/435) *9) - 1
 		print(xposition, yposition)
 		self.layer_of_text()
+
+	def quit(self, event):
+		self.clicker.update_idletasks()
+		self.master.update_idletasks()
+		self.clicker.overrideredirect(False)
+		self.master.overrideredirect(False)
+		quit()
 
 	def layer_of_text(self):
 		xcoordinate = {0: 17,1: 65,2: 114,3: 165,4: 215,5: 263,6: 314,7: 362,8: 410}
@@ -55,11 +64,13 @@ class board(object):
 				lst[i][j].place(x=xcoordinate.get(j), y=ycoordinate.get(i))
 		# self.img.bind('<Button-1>',self.mouseClick)
 		self.clicker = Tk()
-		self.clicker.attributes('-alpha',0.0)
-		initialise(self.clicker)
+		# self.clicker.attributes('-alpha',0.0)
+		initialise(self.clicker, True)
 		self.clicker.focus_set()
 		self.clicker.bind('<Button-1>', self.mouseClick)
-		
+		self.clicker.bind('<Return>', self.mouseClick)
+		self.clicker.bind('q', self.quit)
+
 
 
 
