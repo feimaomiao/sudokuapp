@@ -1,7 +1,9 @@
 from tkinter import *
-from math import ceil
 from PIL import Image, ImageTk
-from solver import *
+import pyscreenshot
+import solver
+import time
+import random
 class boardDimensions(object):
 	def __init__(self):
 		self.x = self.x_ranges()
@@ -49,10 +51,16 @@ def initialise(root):
 	x = (root.winfo_screenwidth() // 2) - (width // 2)
 	y = (root.winfo_screenheight() // 2) - (height // 2)
 	root.geometry('{}x{}+{}+{}'.format(width, height, x, y))
+	return (x, y)
 
 class board(object):
 	def __init__(self, master):
+		self.solvable = False
+		self.solving = False
+		self.verbose = False
 		self.master= master
+		self.solved_list = []
+		self.tries = []
 		self.selected = None
 		self.numList = [[' ' for c in range(9)] for i in range(9)]
 		self.canvas = Canvas(self.master,width=453,height=435)
@@ -102,13 +110,15 @@ class board(object):
 		ycoordinate = {0: 30,1: 76,2: 122,3: 171,4: 216,5: 265,6: 312,7: 357,8: 405}
 		for i in range(9):
 			for j in range(9):
-				text = self.numList[i][j]
+				text =self.numList[i][j]
 				self.canvas.create_text(xcoordinate.get(j), ycoordinate.get(i), text=text, fill='darkblue',font=('Purisa', 25),anchor=CENTER, tags='layertext')
-		return None
+		# return None
 
-		
+
 	def input_numbers(self, event):
-		if not self.selected or event.char not in '123456789':
+		if event.char == 'v':
+			self.verbose = not self.verbose 
+		if not self.selected or event.char not in '123456789' or self.solving:
 			print(event.char)
 			print(selected)
 			return
@@ -116,12 +126,45 @@ class board(object):
 			self.numList[self.selected[1]][self.selected[0]] = event.char
 			self.layer_of_text()
 
+	def transform(self, ll):
+		rl = []
+		for fsl in range(9):
+			rl.append([])
+			for snl in range(9):
+				st = ll[fsl][snl]
+				if st == ' ':
+					st = '0'
+				rl[fsl].append(int(st))
+		return rl
 
-	def solve(self):
-		pass
+	def solve(self, event):
+		self.solving = True
+		transformed = self.transform(self.numList)
+		sudokuboard = solver.sudoku_board(transformed)
+		sudokuboard.solve()
+		self.tried = random.sample(sudokuboard.tried, random.randint(1,100)) if not self.verbose else sudokuboard.tried
+		self.solved_list = sudokuboard.board
+		self.solvable = sudokuboard.finished
+		self.output()
+
+	def output(self):
+		# print(self.tried)
+		for lists in self.tried:
+			print(lists)
+			self.numList = []
+			self.numList = lists
+			self.layer_of_text()
+			self.master.update_idletasks()
+			self.master.after(1, None)
+		self.numList = self.solved_list
+		self.layer_of_text()
+		print(self.solvable)
+
 
 
 	def show_focus(self, x ,y):
+		if self.solving:
+			return
 		print(x, y)
 		xvalues =self.dimensions.x.get(x)
 		yvalues= self.dimensions.y.get(y)

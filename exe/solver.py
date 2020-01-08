@@ -1,3 +1,4 @@
+import copy
 def print_board(board):
 	for i in range(len(board)):
 		if i%3 ==0 and i != 0:
@@ -17,11 +18,12 @@ def print_board(board):
 class sudoku_board():
 	def __init__(self, board):
 		self.board = board
-		self.tries = []
-		self.finished = False
+		self.tried = []
+		self.finished = self.solve()
+		self.solve()
 
 	def __repr__(self):
-		return self.finished
+		return self.board
 
 	def find_empty(self):
 		for i in range(9):
@@ -31,11 +33,11 @@ class sudoku_board():
 		return None
 
 	def valid(self,number, position):
-		for i in range(len(board[0])):
+		for i in range(len(self.board[0])):
 			if self.board[position[0]][i] == number and position[1]!= i:
 				return False
-		for i in range(len(board[0])):
-			if board[i][position[1]] == number and position[0]!= i:
+		for i in range(len(self.board[0])):
+			if self.board[i][position[1]] == number and position[0]!= i:
 				return False
 		xpos = position[1] //3
 		ypos = position[0] //3
@@ -57,28 +59,20 @@ class sudoku_board():
 			if self.valid(i,(row,col)):
 				self.board[row][col]= i
 				if self.solve():
-					self.finished = True
 					return True
-				board[row][col] = 0
-		self.tries.append(self.board)
+				self.board[row][col] = 0
+			self.tried.append(copy.deepcopy(self.board))
 		return False
 
-board=[
-	[7, 8, 0, 4, 0, 0, 1, 2, 0],
-	[6, 0, 0, 0, 7, 5, 0, 0, 9],
-	[0, 0, 0, 6, 0, 1, 0, 7, 8],
-	[0, 0, 7, 0, 4, 0, 2, 6, 0],
-	[0, 0, 1, 0, 5, 0, 9, 3, 0],
-	[9, 0, 4, 0, 6, 0, 0, 0, 5],
-	[0, 7, 0, 3, 0, 0, 0, 1, 2],
-	[1, 2, 0, 0, 0, 7, 4, 0, 0],
-	[0, 4, 9, 2, 0, 6, 0, 0, 7]
-	]
+	def return_board(self):
+		return self.board
 
-# sud = sudoku_board(board)
-# sud.solve()
-# print_board(sud.board)
+board=[[1, 0, 0, 0, 0, 0, 0, 0, 4], [0, 2, 0, 0, 0, 0, 0, 5, 0], [0, 0, 3, 0, 0, 0, 6, 0, 0], [0, 0, 0, 4, 0, 7, 0, 0, 0], [0, 0, 0, 0, 5, 0, 0, 0, 0], [0, 0, 0, 8, 0, 6, 0, 0, 0], [0, 0, 9, 0, 0, 0, 7, 0, 0], [0, 1, 0, 0, 0, 0, 0, 8, 0], [2, 0, 0, 0, 0, 0, 0, 0, 9]]
+
+sud = sudoku_board(board)
+sud.solve()
 # print(sud.tries)
+print_board(sud.board)
 
 
 
