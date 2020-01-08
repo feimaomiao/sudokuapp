@@ -2,14 +2,48 @@ from tkinter import *
 from math import ceil
 from PIL import Image, ImageTk
 from solver import *
+class boardDimensions(object):
+	def __init__(self):
+		self.x = self.x_ranges()
+		self.y = self.y_ranges()
 
-def initialise(root,transparent= False):
+	def __repr__(self):
+		return(self.x,self.y)
+
+	def x_ranges(self):
+		r = {
+		0: (8,54),
+		1: (54,102),
+		2: (104,149),
+		3: (157,201),
+		4: (203,250),
+		5: (252,295),
+		6: (303,346),
+		7: (351, 396),
+		8: (398, 445)
+		}
+		return r
+
+	def y_ranges(self):
+		r = {
+		0: (8,53),
+		1: (53,98),
+		2: (98,143),
+		3: (150,193),
+		4: (193,239),
+		5: (239,285),
+		6: (292,335),
+		7: (335,381),
+		8: (381,426)
+		}
+		return r
+
+
+def initialise(root):
 	root.title('sudoku')
 	root.resizable(False, False)
 	root.minsize(453,435)
 	root.update_idletasks()
-	root.overrideredirect(True)
-	root.attributes('-alpha', 0.0) if transparent else None
 	width = root.winfo_width()
 	height = root.winfo_height()
 	x = (root.winfo_screenwidth() // 2) - (width // 2)
@@ -19,94 +53,86 @@ def initialise(root,transparent= False):
 class board(object):
 	def __init__(self, master):
 		self.master= master
-		self.numList = [[0 for c in range(9)] for i in range(9)]
-		
-	def draw_board(self):
-		render = ImageTk.PhotoImage(Image.open('sudoku.png'))
-		self.img = Label(self.master, image=render)
-		self.img.image=render
-		self.img.pack()
-		# self.img.bind('<Key>', self.mouseClick)
-		# self.img.bind('<Button-1>',self.mouseClick)
-
+		self.selected = None
+		self.numList = [[' ' for c in range(9)] for i in range(9)]
+		self.canvas = Canvas(self.master,width=453,height=435)
+		self.image= ImageTk.PhotoImage(Image.open('sudoku.png'))
+		self.canvas.create_image(0,0,anchor=NW,image=self.image)
+		self.canvas.pack()
+		self.dimensions = boardDimensions()
+		self.canvas.focus_set()
+		self.canvas.bind('q',self.forcequit)
+		self.canvas.bind('<Button-1>',self.mouseClick)
+		self.canvas.bind('<Return>',self.solve)
+		self.canvas.bind('<Key>', self.input_numbers)
 
 	def mouseClick(self, event):
-		self.clicker.destroy()
+		self.selected = None
+		print(event.x, event.y)
+		self.canvas.delete('current_rectangle')
+		loc_y= None
+		loc_x = None
+		for count, items in enumerate(self.dimensions.x.values()):
+			if event.x in range(items[0], items[1]):
+				loc_x = list(self.dimensions.x.keys())[count]
+				break
+		for count,items in enumerate(self.dimensions.y.values()):
+			if event.y in range(items[0],items[1]):
+				loc_y = list(self.dimensions.y.keys())[count]
+				break
+		print(loc_x,loc_y)
 		self.master.update_idletasks()
-		self.master.overrideredirect(False)
-		# self.master.bind('<Key>', quit)
-		loc_x =event.x
-		loc_y = event.y
-		yposition = round((loc_y/453) *9)
-		xposition = ceil((loc_x/435) *9) - 1
-		print(xposition, yposition)
-		self.layer_of_text()
+		self.canvas.focus_set()
+		if loc_x == None or loc_y == None:
+			pass
+		else:
+			self.show_focus(loc_x,loc_y)
+		return None
+		
 
-	def quit(self, event):
-		self.clicker.update_idletasks()
-		self.master.update_idletasks()
-		self.clicker.overrideredirect(False)
+	def forcequit(self, event):
 		self.master.overrideredirect(False)
+		print('quit')
+		self.master.update_idletasks()
 		quit()
 
 	def layer_of_text(self):
-		xcoordinate = {0: 17,1: 65,2: 114,3: 165,4: 215,5: 263,6: 314,7: 362,8: 410}
-		ycoordinate = {0: 14,1: 59,2: 105,3: 150,4: 196,5: 247,6: 295,7: 341,8: 387}
-		lst= []
-		
-		for count, i in enumerate(self.numList):
-			lst.append([])
-			for j in i:
-				# text = StringVar(self.master, j)
-				lst[count].append(Label(self.master, text=j, fg='blue',font=(None,25)))
+		self.canvas.delete('layertext')
+		xcoordinate = {0: 31,1: 76,2: 127,3: 178,4: 226,5: 276,6: 325,7: 376,8: 420}
+		ycoordinate = {0: 30,1: 76,2: 122,3: 171,4: 216,5: 265,6: 312,7: 357,8: 405}
 		for i in range(9):
 			for j in range(9):
-				lst[i][j].place(x=xcoordinate.get(j), y=ycoordinate.get(i))
-		# self.img.bind('<Button-1>',self.mouseClick)
-		self.clicker = Tk()
-		# self.clicker.attributes('-alpha',0.0)
-		initialise(self.clicker, True)
-		self.clicker.focus_set()
-		self.clicker.bind('<Button-1>', self.mouseClick)
-		self.clicker.bind('<Return>', self.mouseClick)
-		self.clicker.bind('q', self.quit)
+				text = self.numList[i][j]
+				self.canvas.create_text(xcoordinate.get(j), ycoordinate.get(i), text=text, fill='darkblue',font=('Purisa', 25),anchor=CENTER, tags='layertext')
+		return None
+
+		
+	def input_numbers(self, event):
+		if not self.selected or event.char not in '123456789':
+			print(event.char)
+			print(selected)
+			return
+		else: 
+			self.numList[self.selected[1]][self.selected[0]] = event.char
+			self.layer_of_text()
 
 
+	def solve(self):
+		pass
 
 
+	def show_focus(self, x ,y):
+		print(x, y)
+		xvalues =self.dimensions.x.get(x)
+		yvalues= self.dimensions.y.get(y)
+		self.canvas.create_rectangle(xvalues[0],yvalues[0],xvalues[1],yvalues[1],outline='red',tags='current_rectangle',width=5)
+		self.selected = (x, y)
+		return None
 
-
-# A.y == 14
-# B.Y == 59
-# C.Y == 105
-# D.Y == 150
-# E.Y == 196
-# F.Y == 247
-# G.Y == 295
-# H.Y == 341
-# I.Y == 387
-
-# 0.x == 17
-# 1.x == 65
-# 2.x == 114
-# 3.x == 165
-# 4.x == 215
-# 5,x == 263
-# 6.x == 314
-# 7.x == 362
-# 8.x == 410
-
-# 0, 1, 2, 3, 4, 5, 6, 7 ,8 ,9
-# a
-# b
-# c
-# ...
 
 if __name__ == '__main__':
 	root = Tk()
 	initialise(root)
 	sudokuB = board(root)
-	# root.bind('<Button-1>', sudokuB.mouseClick)
-	sudokuB.draw_board()
 	sudokuB.layer_of_text()
 	root.mainloop()

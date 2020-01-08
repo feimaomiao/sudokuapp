@@ -17,13 +17,15 @@ def print_board(board):
 class sudoku_board():
 	def __init__(self, board):
 		self.board = board
+		self.tries = []
+		self.finished = False
 
 	def __repr__(self):
-		return self.board
+		return self.finished
 
 	def find_empty(self):
-		for i in range(len(self.board)):
-			for j in range(len(self.board[0])):
+		for i in range(9):
+			for j in range(9):
 				if self.board[i][j]==0:
 					return(i,j)
 		return None
@@ -43,6 +45,7 @@ class sudoku_board():
 					return False
 		return True
 
+
 	def solve(self):
 		find= self.find_empty()
 		if not find:
@@ -54,25 +57,28 @@ class sudoku_board():
 			if self.valid(i,(row,col)):
 				self.board[row][col]= i
 				if self.solve():
+					self.finished = True
 					return True
 				board[row][col] = 0
+		self.tries.append(self.board)
 		return False
 
-# board=[
-# 	[7, 8, 0, 4, 0, 0, 1, 2, 0],
-# 	[6, 0, 0, 0, 7, 5, 0, 0, 9],
-# 	[0, 0, 0, 6, 0, 1, 0, 7, 8],
-# 	[0, 0, 7, 0, 4, 0, 2, 6, 0],
-# 	[0, 0, 1, 0, 5, 0, 9, 3, 0],
-# 	[9, 0, 4, 0, 6, 0, 0, 0, 5],
-# 	[0, 7, 0, 3, 0, 0, 0, 1, 2],
-# 	[1, 2, 0, 0, 0, 7, 4, 0, 0],
-# 	[0, 4, 9, 2, 0, 6, 0, 0, 7]
-# 	]
+board=[
+	[7, 8, 0, 4, 0, 0, 1, 2, 0],
+	[6, 0, 0, 0, 7, 5, 0, 0, 9],
+	[0, 0, 0, 6, 0, 1, 0, 7, 8],
+	[0, 0, 7, 0, 4, 0, 2, 6, 0],
+	[0, 0, 1, 0, 5, 0, 9, 3, 0],
+	[9, 0, 4, 0, 6, 0, 0, 0, 5],
+	[0, 7, 0, 3, 0, 0, 0, 1, 2],
+	[1, 2, 0, 0, 0, 7, 4, 0, 0],
+	[0, 4, 9, 2, 0, 6, 0, 0, 7]
+	]
 
 # sud = sudoku_board(board)
 # sud.solve()
 # print_board(sud.board)
+# print(sud.tries)
 
 
 
