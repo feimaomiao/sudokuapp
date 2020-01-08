@@ -14,13 +14,15 @@ def print_board(board):
 			else:
 
 				print(str(board[i][j])+' ', end='')
+		
 
-class sudoku_board():
+class sudoku_board(object):
 	def __init__(self, board):
 		self.board = board
+		self.original_board = copy.deepcopy(board)
 		self.tried = []
-		self.finished = self.solve()
-		self.solve()
+		self.finished = self.check_valid()
+		self.solve() if self.finished else None
 
 	def __repr__(self):
 		return self.board
@@ -64,16 +66,49 @@ class sudoku_board():
 			self.tried.append(copy.deepcopy(self.board))
 		return False
 
+	def check_valid(self):
+		for i in range(9):
+			for j in self.board[i]:
+				if self.board[i].count(j)> 1 and j != 0:
+					self.finished = False
+					return False
+			vert = [self.board[i][j] for j in range(9)]
+			for j in vert:
+				if vert.count(j) > 1 and j != 0:
+					self.finished = False
+					return False
+			group = []
+			x0 = i%3*3
+			x1 = i%3*3+3
+			y0 = i//3
+			y1 = i//3 +3
+			for ys in range(y0,y1):
+				for xs in range(x0, x1):
+					group.append(self.board[ys][xs])
+			for nums in group:
+				if group.count(nums) >1 and nums != 0:
+					self.finished = False
+					return False
+		return True
+
+
+
+
+
+
 	def return_board(self):
 		return self.board
 
-board=[[1, 0, 0, 0, 0, 0, 0, 0, 4], [0, 2, 0, 0, 0, 0, 0, 5, 0], [0, 0, 3, 0, 0, 0, 6, 0, 0], [0, 0, 0, 4, 0, 7, 0, 0, 0], [0, 0, 0, 0, 5, 0, 0, 0, 0], [0, 0, 0, 8, 0, 6, 0, 0, 0], [0, 0, 9, 0, 0, 0, 7, 0, 0], [0, 1, 0, 0, 0, 0, 0, 8, 0], [2, 0, 0, 0, 0, 0, 0, 0, 9]]
+board=[[1, 0, 0, 0, 0, 0, 0, 0, 4], [0, 2, 0, 0, 0, 0, 0, 5, 0], [0, 0, 3, 0, 0, 0, 6, 0, 0], [0, 0, 0, 4, 0, 7, 0, 0, 0], [0, 0, 0, 0, 5, 0, 0, 0, 5], [0, 0, 0, 8, 0, 6, 0, 0, 0], [0, 0, 9, 0, 0, 0, 7, 0, 0], [0, 1, 0, 0, 0, 0, 0, 8, 0], [2, 0, 0, 0, 0, 0, 0, 0, 9]]
 
+# sud = sudoku_board(board)
+# sud.solve()
+# sud.check_valid()
+# # print(sud.tries)
+# print(sud.finished)
+# print_board(sud.board)
 sud = sudoku_board(board)
-sud.solve()
-# print(sud.tries)
 print_board(sud.board)
-
 
 
 

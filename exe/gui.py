@@ -144,8 +144,11 @@ class board(object):
 		sudokuboard.solve()
 		self.tried = random.sample(sudokuboard.tried, random.randint(1,100)) if not self.verbose else sudokuboard.tried
 		self.solved_list = sudokuboard.board
-		self.solvable = sudokuboard.finished
-		self.output()
+		self.solvable = bool(sudokuboard.finished)
+		self.output() if self.solvable else self.find_culprit()
+
+	def find_culprit(self):
+		print(self.solvable)
 
 	def output(self):
 		# print(self.tried)
