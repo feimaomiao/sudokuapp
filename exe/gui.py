@@ -73,7 +73,7 @@ class board(object):
 		self.canvas.focus_set()
 		self.canvas.bind('q',self.forcequit)
 		self.canvas.bind('<Button-1>',self.mouseClick)
-		self.canvas.bind('w', lambda action: self.clear_screen())
+		self.canvas.bind('r', lambda action: self.clear_screen())
 		self.canvas.bind('<Return>',self.solve)
 		self.canvas.bind('<Key>', self.input_numbers)
 		self.canvas.bind('a', lambda action: self.change_focus('<Left>',3))
