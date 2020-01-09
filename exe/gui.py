@@ -1,4 +1,5 @@
 from tkinter import *
+import copy
 from PIL import Image, ImageTk
 import pyscreenshot
 import solver
@@ -66,13 +67,57 @@ class board(object):
 		self.canvas = Canvas(self.master,width=453,height=435)
 		self.image= ImageTk.PhotoImage(Image.open('sudoku.png'))
 		self.canvas.create_image(0,0,anchor=NW,image=self.image)
+		self.copy_of_board = []
 		self.canvas.pack()
 		self.dimensions = boardDimensions()
 		self.canvas.focus_set()
 		self.canvas.bind('q',self.forcequit)
 		self.canvas.bind('<Button-1>',self.mouseClick)
+		self.canvas.bind('w', lambda action: self.clear_screen())
 		self.canvas.bind('<Return>',self.solve)
 		self.canvas.bind('<Key>', self.input_numbers)
+		self.canvas.bind('a', lambda action: self.change_focus('<Left>',3))
+		self.canvas.bind('d', lambda action: self.change_focus('<Right>',3))
+		self.canvas.bind('s', lambda action: self.change_focus('<Down>',3))
+		self.canvas.bind('w', lambda action: self.change_focus('<Up>',3))
+		self.canvas.bind('<Left>', lambda action: self.change_focus('<Left>'))
+		self.canvas.bind('<Right>', lambda action: self.change_focus('<Right>'))
+		self.canvas.bind('<Up>', lambda action: self.change_focus('<Up>'))
+		self.canvas.bind('<Down>', lambda action: self.change_focus('<Down>'))
+
+	def clear_screen(self):
+		self.numList = [[' ' for c in range(9)] for i in range(9)]
+		self.solvable = False
+		self.solving = False
+		self.selected = None
+		self.layer_of_text()
+		return
+
+	def change_focus(self, direction,no =1):
+		# print(direction)
+		self.canvas.delete('current_rectangle')
+		csx,csy = (0,0) if not self.selected else self.selected
+		if direction == '<Left>':
+			csx -= no
+			if csx<0: csx+=9
+			if not self.selected: csx = 8
+			self.show_focus(csx, csy)
+		elif direction == '<Right>':
+			csx += no
+			if csx >8: csx -= 9
+			if not self.selected: csx = 0
+			self.show_focus(csx, csy)
+		elif direction == '<Up>':
+			csy -= no
+			if csy <0: csy += 9
+			if not self.selected: csy = 8
+			self.show_focus(csx, csy)
+		else:
+			csy += no
+			if csy >8: csy -= 9
+			if not self.selected: csy = 0
+			self.show_focus(csx, csy)
+		return
 
 	def mouseClick(self, event):
 		self.selected = None
@@ -116,17 +161,32 @@ class board(object):
 
 
 	def input_numbers(self, event):
+		print(event)
 		if event.char == 'v':
 			self.verbose = not self.verbose 
-		if not self.selected or event.char not in '123456789' or self.solving:
+		if not self.selected or event.char not in '0123456789' or self.solving:
 			print(event.char)
-			print(selected)
+			print(self.selected)
 			return
 		else: 
-			self.numList[self.selected[1]][self.selected[0]] = event.char
-			self.layer_of_text()
+			inputed = event.char
+			if inputed == '0':
+				inputed = ' '
+			copy_of_board = copy.deepcopy(self.numList)
+			copy_of_board[self.selected[1]][self.selected[0]] = inputed
+			copy_of_board = self.transform(copy_of_board)
+			print(copy_of_board)
+			test = solver.sudoku_board(copy_of_board)
+			if test.finished:
+				self.numList[self.selected[1]][self.selected[0]] = inputed
+				self.layer_of_text()
+			else:
+				print('Nope')
+			del(test)
+			return
 
-	def transform(self, ll):
+	@staticmethod
+	def transform(ll):
 		rl = []
 		for fsl in range(9):
 			rl.append([])
@@ -141,17 +201,18 @@ class board(object):
 		self.solving = True
 		transformed = self.transform(self.numList)
 		sudokuboard = solver.sudoku_board(transformed)
-		sudokuboard.solve()
-		self.tried = random.sample(sudokuboard.tried, random.randint(1,100)) if not self.verbose else sudokuboard.tried
-		self.solved_list = sudokuboard.board
-		self.solvable = bool(sudokuboard.finished)
-		self.output() if self.solvable else self.find_culprit()
+		self.solvable = sudokuboard.finished
+		if self.solvable:
+			self.tried = random.sample(sudokuboard.tried, random.randint(1,100)) if not self.verbose else sudokuboard.tried
+			self.solved_list = sudokuboard.board
+			self.output()
+		else:
+			self.find_culprit()
 
 	def find_culprit(self):
 		print(self.solvable)
 
 	def output(self):
-		# print(self.tried)
 		for lists in self.tried:
 			print(lists)
 			self.numList = []

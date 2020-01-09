@@ -70,29 +70,29 @@ class sudoku_board(object):
 		for i in range(9):
 			for j in self.board[i]:
 				if self.board[i].count(j)> 1 and j != 0:
+					print(self.board[i])
 					self.finished = False
 					return False
 			vert = [self.board[i][j] for j in range(9)]
 			for j in vert:
 				if vert.count(j) > 1 and j != 0:
+					print(vert)
 					self.finished = False
 					return False
 			group = []
 			x0 = i%3*3
 			x1 = i%3*3+3
-			y0 = i//3
-			y1 = i//3 +3
+			y0 = i//3*3
+			y1 = i//3*3 +3
 			for ys in range(y0,y1):
 				for xs in range(x0, x1):
 					group.append(self.board[ys][xs])
 			for nums in group:
 				if group.count(nums) >1 and nums != 0:
+					print(group)
 					self.finished = False
 					return False
 		return True
-
-
-
 
 
 
