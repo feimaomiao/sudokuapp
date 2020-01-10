@@ -23,7 +23,7 @@ class sudoku_board(object):
 		self.original_board = copy.deepcopy(board)
 		self.tried = []
 		self.finished = self.check_valid()
-		self.solve() if self.finished else None
+		# self.solve() if self.finished else None
 
 	def __repr__(self):
 		return self.board
@@ -100,7 +100,7 @@ class sudoku_board(object):
 	def return_board(self):
 		return self.board
 
-board=[[7, 0, 3, 0, 0, 4, 0, 9, 0], [0, 0, 0, 5, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 7, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 8, 4], [0, 0, 0, 0, 0, 0, 0, 0, 9], [3, 0, 0, 7, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 0, 0, 6, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [8, 0, 0, 0, 0, 6, 0, 1, 0]]
+# board=[[7, 0, 3, 0, 0, 4, 0, 9, 0], [0, 0, 0, 5, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 7, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 8, 4], [0, 0, 0, 0, 0, 0, 0, 0, 9], [3, 0, 0, 7, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 0, 0, 6, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [8, 0, 0, 0, 0, 6, 0, 1, 0]]
 
 # sud = sudoku_board(board)
 # sud.solve()
@@ -108,15 +108,16 @@ board=[[7, 0, 3, 0, 0, 4, 0, 9, 0], [0, 0, 0, 5, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0,
 # # print(sud.tries)
 # print(sud.finished)
 # print_board(sud.board)
-sud = sudoku_board(board)
-print_board(sud.board)
+# sud = sudoku_board(board)
+# print_board(sud.board)
 
-def generate_board():
-	gen_board = [[0 for i in range(9)] for i in range(9)]
+def generate_unsolved_board():
+	board_copy = [[0 for i in range(9)] for i in range(9)]
+	# board_copy = copy.deepcopy(gen_board)
 	possible = [i for i in range(1,10)]
 	for i in range(20):
 		print('i',i)
-		board_copy = copy.deepcopy(gen_board)
+		# board_copy = copy.deepcopy(gen_board)
 		x = random.randrange(9)
 		y = random.randrange(9)
 		print(x, y)
@@ -124,14 +125,40 @@ def generate_board():
 			board_copy[x][y] = random.choice(possible)
 			tester = sudoku_board(board_copy)
 			if not tester.finished:
-				i -= 1
-				pass
+				board_copy[x][y] = 0
 			else:
-				gen_board = copy.deepcopy(board_copy)
+				pass
 			del(tester)
 		else:
-			i -= 1
-	return gen_board
+			print('Got lucky')
+			continue
+	# gen_board = copy.deepcopy(board_copy)
+	return board_copy
+
+
+def return_generated_board(board=[],difficulty='easy'):
+	generated_board = board
+	rboard = []
+	amount_of_empty_spots = 0
+	if board==[]:
+		generated_board = generate_unsolved_board()
+	print('145')
+	rboard_obj = sudoku_board(generated_board)
+	rboard_obj.solve()
+	print('147')
+	rboard = copy.deepcopy(rboard_obj.board)
+	print('149')
+	if difficulty == 'easy':
+		amount_of_empty_spots = random.randrange(25,40)
+		for i in range(amount_of_empty_spots):
+			rm_x = random.randrange(9)
+			rm_y = random.randrange(9)
+			rboard[rm_x][rm_y] = 0
+	return rboard
+
+
+
+
 
 
 
