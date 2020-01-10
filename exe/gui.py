@@ -59,6 +59,7 @@ class board(object):
 		self.solvable = False
 		self.solving = False
 		self.verbose = False
+		self.print_all = True
 		self.master= master
 		self.solved_list = []
 		self.tries = []
@@ -73,6 +74,7 @@ class board(object):
 		self.canvas.focus_set()
 		self.canvas.bind('q',self.forcequit)
 		self.canvas.bind('<Button-1>',self.mouseClick)
+		self.canvas.bind('p', self.set_printall)
 		self.canvas.bind('r', lambda action: self.clear_screen())
 		self.canvas.bind('<Return>',self.solve)
 		self.canvas.bind('<Key>', self.input_numbers)
@@ -84,6 +86,10 @@ class board(object):
 		self.canvas.bind('<Right>', lambda action: self.change_focus('<Right>'))
 		self.canvas.bind('<Up>', lambda action: self.change_focus('<Up>'))
 		self.canvas.bind('<Down>', lambda action: self.change_focus('<Down>'))
+
+	def set_printall(self, event):
+		self.print_all = not(self.print_all)
+
 
 	def clear_screen(self):
 		self.numList = [[' ' for c in range(9)] for i in range(9)]
@@ -213,13 +219,14 @@ class board(object):
 		print(self.solvable)
 
 	def output(self):
-		for lists in self.tried:
-			print(lists)
-			self.numList = []
-			self.numList = lists
-			self.layer_of_text()
-			self.master.update_idletasks()
-			self.master.after(1, None)
+		if self.print_all:
+			for lists in self.tried:
+				print(lists)
+				self.numList = []
+				self.numList = lists
+				self.layer_of_text()
+				self.master.update_idletasks()
+				self.master.after(1, None)
 		self.numList = self.solved_list
 		self.layer_of_text()
 		print(self.solvable)

@@ -1,4 +1,5 @@
 import copy
+import random
 def print_board(board):
 	for i in range(len(board)):
 		if i%3 ==0 and i != 0:
@@ -18,7 +19,7 @@ def print_board(board):
 
 class sudoku_board(object):
 	def __init__(self, board):
-		self.board = board
+		self.board = copy.deepcopy(board)
 		self.original_board = copy.deepcopy(board)
 		self.tried = []
 		self.finished = self.check_valid()
@@ -99,7 +100,7 @@ class sudoku_board(object):
 	def return_board(self):
 		return self.board
 
-board=[[1, 0, 0, 0, 0, 0, 0, 0, 4], [0, 2, 0, 0, 0, 0, 0, 5, 0], [0, 0, 3, 0, 0, 0, 6, 0, 0], [0, 0, 0, 4, 0, 7, 0, 0, 0], [0, 0, 0, 0, 5, 0, 0, 0, 5], [0, 0, 0, 8, 0, 6, 0, 0, 0], [0, 0, 9, 0, 0, 0, 7, 0, 0], [0, 1, 0, 0, 0, 0, 0, 8, 0], [2, 0, 0, 0, 0, 0, 0, 0, 9]]
+board=[[7, 0, 3, 0, 0, 4, 0, 9, 0], [0, 0, 0, 5, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 7, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 8, 4], [0, 0, 0, 0, 0, 0, 0, 0, 9], [3, 0, 0, 7, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 0, 0, 6, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [8, 0, 0, 0, 0, 6, 0, 1, 0]]
 
 # sud = sudoku_board(board)
 # sud.solve()
@@ -109,6 +110,30 @@ board=[[1, 0, 0, 0, 0, 0, 0, 0, 4], [0, 2, 0, 0, 0, 0, 0, 5, 0], [0, 0, 3, 0, 0,
 # print_board(sud.board)
 sud = sudoku_board(board)
 print_board(sud.board)
+
+def generate_board():
+	gen_board = [[0 for i in range(9)] for i in range(9)]
+	possible = [i for i in range(1,10)]
+	for i in range(20):
+		print('i',i)
+		board_copy = copy.deepcopy(gen_board)
+		x = random.randrange(9)
+		y = random.randrange(9)
+		print(x, y)
+		if board_copy[x][y] == 0:
+			board_copy[x][y] = random.choice(possible)
+			tester = sudoku_board(board_copy)
+			if not tester.finished:
+				i -= 1
+				pass
+			else:
+				gen_board = copy.deepcopy(board_copy)
+			del(tester)
+		else:
+			i -= 1
+	return gen_board
+
+
 
 
 
