@@ -1,6 +1,6 @@
 from tkinter import *
 import copy
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageGrab
 import pyscreenshot
 import solver
 import time
@@ -49,9 +49,11 @@ def initialise(root):
 	root.update_idletasks()
 	width = root.winfo_width()
 	height = root.winfo_height()
+	print(root.winfo_screenwidth(), root.winfo_screenheight())
 	x = (root.winfo_screenwidth() // 2) - (width // 2)
 	y = (root.winfo_screenheight() // 2) - (height // 2)
 	root.geometry('{}x{}+{}+{}'.format(width, height, x, y))
+	print(x, y)
 	return (x, y)
 
 class board(object):
@@ -61,6 +63,7 @@ class board(object):
 		self.verbose = False
 		self.print_all = True
 		self.master= master
+		print(self.master.winfo_x(), self.master.winfo_y())
 		self.solved_list = []
 		self.tries = []
 		self.selected = None
@@ -150,16 +153,38 @@ class board(object):
 		return None
 		
 	def generate_board(self):
+		self.canvas.pack_forget()
 		var = StringVar()
-		easy = Radiobutton(self.canvas, text='easy', command= lambda: var.set('easy'))
-		medium = Radiobutton(self.canvas, text='medium', command= lambda: var.set('medium'))
+		frame = Frame(self.master, bg='black')
+		frame.pack(fill=BOTH)
+		easy = Radiobutton(frame, text='easy', command= lambda: var.set('easy'))
+		medium = Radiobutton(frame, text='medium', command= lambda: var.set('medium'))
+		hard= Radiobutton(frame, text='hard', command=lambda: var.set('hard'))
+		insane= Radiobutton(frame, text='insane', command= lambda: var.set('insane'))
 		easy.pack()
 		medium.pack()
+		hard.pack()
+		insane.pack()
 		easy.wait_variable(var)
-		medium.wait_variable(var)
-		print(var.get())
-		easy.pack_forget()
-		medium.pack_forget()
+		self.numList= solver.return_generated_board(var.get())
+		frame.destroy()
+		self.canvas.pack()
+		self.layer_of_text()
+		self.screenshot('Desktop/sudoku')
+
+	def screenshot(self, fileName):
+	    # x=root.winfo_rootx()+widget.winfo_x()
+	    # y=root.winfo_rooty()+widget.winfo_y()
+	    # x1=x+widget.winfo_width()
+	    # y1=y+widget.winfo_height()
+	    # ImageGrab.grab().crop((x,y,x1,y1)).save("/Users/MatthewLam/Desktop/sudoku.png")
+	    # save postscipt image 
+	    self.canvas.postscript(file = fileName + '.eps') 
+	    # use PIL to convert to PNG 
+	    img = Image.open(fileName + '.eps') 
+	    img.save(fileName + '.png', 'png') 
+
+
 
 	def forcequit(self, event):
 		self.master.overrideredirect(False)
@@ -174,6 +199,8 @@ class board(object):
 		for i in range(9):
 			for j in range(9):
 				text =self.numList[i][j]
+				if text == 0:
+					text = ' '
 				self.canvas.create_text(xcoordinate.get(j), ycoordinate.get(i), text=text, fill='darkblue',font=('Purisa', 25),anchor=CENTER, tags='layertext')
 		# return None
 

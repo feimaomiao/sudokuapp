@@ -115,7 +115,7 @@ class sudoku_board(object):
 def generate_unsolved_board():
 	board_copy = [[0 for i in range(9)] for i in range(9)]
 	possible = [i for i in range(1,10)]
-	for i in range(20):
+	for i in range(15):
 		print('i',i)
 		x = random.randrange(9)
 		y = random.randrange(9)
@@ -134,7 +134,7 @@ def generate_unsolved_board():
 	return board_copy
 
 
-def return_generated_board(board=[],difficulty='easy'):
+def return_generated_board(difficulty='easy',board=[]):
 	generated_board = board
 	rboard = []
 	amount_of_empty_spots = 0
