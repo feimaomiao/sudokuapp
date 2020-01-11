@@ -23,7 +23,7 @@ class sudoku_board(object):
 		self.original_board = copy.deepcopy(board)
 		self.tried = []
 		self.finished = self.check_valid()
-		# self.solve() if self.finished else None
+		self.solve() if self.finished else None
 
 	def __repr__(self):
 		return self.board
@@ -62,19 +62,20 @@ class sudoku_board(object):
 			if self.valid(i,(row,col)):
 				self.board[row][col]= i
 				if self.solve():
+					self.finished = True
 					return True
 				self.board[row][col] = 0
-			self.tried.append(copy.deepcopy(self.board))
+			self.tried.append(self.board)
 		return False
 
 	def check_valid(self):
 		for i in range(9):
 			for j in self.board[i]:
-				if self.board[i].count(j)> 1 and j != 0:
+				if self.board[i].count(j) > 1 and j != 0:
 					print(self.board[i])
 					self.finished = False
 					return False
-			vert = [self.board[i][j] for j in range(9)]
+			vert = [self.board[j][i] for j in range(9)]
 			for j in vert:
 				if vert.count(j) > 1 and j != 0:
 					print(vert)
@@ -113,18 +114,16 @@ class sudoku_board(object):
 
 def generate_unsolved_board():
 	board_copy = [[0 for i in range(9)] for i in range(9)]
-	# board_copy = copy.deepcopy(gen_board)
 	possible = [i for i in range(1,10)]
 	for i in range(20):
 		print('i',i)
-		# board_copy = copy.deepcopy(gen_board)
 		x = random.randrange(9)
 		y = random.randrange(9)
 		print(x, y)
 		if board_copy[x][y] == 0:
 			board_copy[x][y] = random.choice(possible)
 			tester = sudoku_board(board_copy)
-			if not tester.finished:
+			if not tester.check_valid():
 				board_copy[x][y] = 0
 			else:
 				pass
@@ -132,7 +131,6 @@ def generate_unsolved_board():
 		else:
 			print('Got lucky')
 			continue
-	# gen_board = copy.deepcopy(board_copy)
 	return board_copy
 
 
@@ -144,18 +142,27 @@ def return_generated_board(board=[],difficulty='easy'):
 		generated_board = generate_unsolved_board()
 	print('145')
 	rboard_obj = sudoku_board(generated_board)
-	rboard_obj.solve()
 	print('147')
-	rboard = copy.deepcopy(rboard_obj.board)
+	print(generated_board)
+	rboard_obj.solve()
 	print('149')
+	rboard = rboard_obj.board
+	print('151')
 	if difficulty == 'easy':
-		amount_of_empty_spots = random.randrange(25,40)
-		for i in range(amount_of_empty_spots):
-			rm_x = random.randrange(9)
-			rm_y = random.randrange(9)
-			rboard[rm_x][rm_y] = 0
+		amount_of_empty_spots = random.randrange(15,30)
+	elif difficulty == 'medium':
+		amount_of_empty_spots = random.randrange(30,45)
+	elif difficulty == 'hard':
+		amount_of_empty_spots = random.randrange(45,60)
+	elif difficulty == 'insane':
+		amount_of_empty_spots = random.randrange(60, 75)
+	else:
+		amount_of_empty_spots = random.randrange(15,75)
+	for i in range(amount_of_empty_spots):
+		rm_x = random.randrange(9)
+		rm_y = random.randrange(9)
+		rboard[rm_x][rm_y]=0
 	return rboard
-
 
 
 

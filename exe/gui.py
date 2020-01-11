@@ -72,20 +72,21 @@ class board(object):
 		self.canvas.pack()
 		self.dimensions = boardDimensions()
 		self.canvas.focus_set()
-		self.canvas.bind('q',self.forcequit)
 		self.canvas.bind('<Button-1>',self.mouseClick)
+		self.canvas.bind('<Return>',self.solve)
+		self.canvas.bind('q',self.forcequit)
 		self.canvas.bind('p', self.set_printall)
 		self.canvas.bind('r', lambda action: self.clear_screen())
-		self.canvas.bind('<Return>',self.solve)
-		self.canvas.bind('<Key>', self.input_numbers)
 		self.canvas.bind('a', lambda action: self.change_focus('<Left>',3))
 		self.canvas.bind('d', lambda action: self.change_focus('<Right>',3))
 		self.canvas.bind('s', lambda action: self.change_focus('<Down>',3))
 		self.canvas.bind('w', lambda action: self.change_focus('<Up>',3))
+		self.canvas.bind('g', lambda action: self.generate_board())
 		self.canvas.bind('<Left>', lambda action: self.change_focus('<Left>'))
 		self.canvas.bind('<Right>', lambda action: self.change_focus('<Right>'))
 		self.canvas.bind('<Up>', lambda action: self.change_focus('<Up>'))
 		self.canvas.bind('<Down>', lambda action: self.change_focus('<Down>'))
+		self.canvas.bind('<Key>', self.input_numbers)
 
 	def set_printall(self, event):
 		self.print_all = not(self.print_all)
@@ -148,6 +149,10 @@ class board(object):
 			self.show_focus(loc_x,loc_y)
 		return None
 		
+	def generate_board(self):
+		self.master.withdraw()
+
+		self.master.deiconify()
 
 	def forcequit(self, event):
 		self.master.overrideredirect(False)
