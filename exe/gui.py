@@ -1,13 +1,7 @@
 from tkinter import *
-import os
-import copy
-from PIL import Image, ImageTk, ImageGrab
 from tkinter import filedialog
-# from tkFileDialog import asksaveasfilename
-import pyscreenshot
-import solver
-import time
-import random
+from PIL import Image, ImageTk, ImageGrab
+import os, copy, solver, time, random
 class boardDimensions(object):
 	def __init__(self):
 		self.x = self.x_ranges()
@@ -81,7 +75,8 @@ class board(object):
 		self.canvas.bind('<Button-1>',self.mouseClick)
 		self.canvas.bind('<Return>',self.solve)
 		self.canvas.bind('q',self.forcequit)
-		self.canvas.bind('p', self.set_printall)
+		self.canvas.bind('p', lambda action: self.set_nottrue(self.print_all))
+		self.canvas.bind('v', lambda action: self.set_nottrue(self.verbose))
 		self.canvas.bind('r', lambda action: self.clear_screen())
 		self.canvas.bind('a', lambda action: self.change_focus('<Left>',3))
 		self.canvas.bind('d', lambda action: self.change_focus('<Right>',3))
@@ -94,8 +89,8 @@ class board(object):
 		self.canvas.bind('<Down>', lambda action: self.change_focus('<Down>'))
 		self.canvas.bind('<Key>', self.input_numbers)
 
-	def set_printall(self, event):
-		self.print_all = not(self.print_all)
+	def set_nottrue(self, action):
+		action = not(action)
 
 
 	def clear_screen(self):
@@ -159,7 +154,7 @@ class board(object):
 		self.canvas.pack_forget()
 		var = StringVar()
 		frame = Frame(self.master, bg='black')
-		frame.pack(fill=BOTH)
+		frame.pack(fill=BOTH, expand = 1)
 		easy = Radiobutton(frame, text='easy', command= lambda: var.set('easy'))
 		medium = Radiobutton(frame, text='medium', command= lambda: var.set('medium'))
 		hard= Radiobutton(frame, text='hard', command=lambda: var.set('hard'))
@@ -204,81 +199,66 @@ class board(object):
 
 
 	def input_numbers(self, event):
-		print(event)
-		if event.char == 'v':
-			self.verbose = not self.verbose 
-		if not self.selected or event.char not in '0123456789' or self.solving:
-			print(event.char)
-			print(self.selected)
-			return
+		# lets user input number
+		if not self.selected or event.char not in '0123456789' or self.solving:	return
 		else: 
 			inputed = event.char
-			if inputed == '0':
-				inputed = ' '
+			if inputed == '0':		inputed = ' '
 			copy_of_board = copy.deepcopy(self.numList)
 			copy_of_board[self.selected[1]][self.selected[0]] = inputed
 			copy_of_board = self.transform(copy_of_board)
-			print(copy_of_board)
 			test = solver.sudoku_board(copy_of_board)
 			if test.finished:
 				self.numList[self.selected[1]][self.selected[0]] = inputed
 				self.layer_of_text()
-			else:
-				print('Nope')
+			else:	pass
 			del(test)
 			return
 
 	@staticmethod
 	def transform(ll):
+		# change spaces for output to int 0s
 		rl = []
 		for fsl in range(9):
 			rl.append([])
 			for snl in range(9):
 				st = ll[fsl][snl]
-				if st == ' ':
-					st = '0'
+				if st == ' ':	st = '0'
 				rl[fsl].append(int(st))
 		return rl
 
 	def solve(self, event):
+		if self.solving:	return
 		self.solving = True
 		transformed = self.transform(self.numList)
 		sudokuboard = solver.sudoku_board(transformed)
 		self.solvable = sudokuboard.finished
-		if self.solvable:
-			self.tried = random.sample(sudokuboard.tried, random.randint(1,100)) if not self.verbose else sudokuboard.tried
-			self.solved_list = sudokuboard.board
-			self.output()
-		else:
-			self.find_culprit()
-
-	def find_culprit(self):
-		print(self.solvable)
+		try:				self.tried = sudokuboard.tried if self.verbose else random.sample(sudokuboard.tried,random.randrange(20,100))
+		except ValueError:	pass
+		self.solved_list = sudokuboard.board
+		self.output()
 
 	def output(self):
+		if self.tried == None:	self.print_all = False
 		if self.print_all:
 			for lists in self.tried:
 				print(lists)
 				self.numList = []
 				self.numList = lists
 				self.layer_of_text()
+				self.canvas.after(1, None)
 				self.master.update_idletasks()
-				self.master.after(1, None)
 		self.numList = self.solved_list
 		self.layer_of_text()
-		print(self.solvable)
-
-
 
 	def show_focus(self, x ,y):
-		if self.solving:
-			return
+		if self.solving:	return
 		print(x, y)
 		xvalues =self.dimensions.x.get(x)
 		yvalues= self.dimensions.y.get(y)
 		self.canvas.create_rectangle(xvalues[0],yvalues[0],xvalues[1],yvalues[1],outline='red',tags='current_rectangle',width=5)
 		self.selected = (x, y)
-		return None
+		return 
 
 
 if __name__ == '__main__':
