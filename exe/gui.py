@@ -150,9 +150,16 @@ class board(object):
 		return None
 		
 	def generate_board(self):
-		self.master.withdraw()
-
-		self.master.deiconify()
+		var = StringVar()
+		easy = Radiobutton(self.canvas, text='easy', command= lambda: var.set('easy'))
+		medium = Radiobutton(self.canvas, text='medium', command= lambda: var.set('medium'))
+		easy.pack()
+		medium.pack()
+		easy.wait_variable(var)
+		medium.wait_variable(var)
+		print(var.get())
+		easy.pack_forget()
+		medium.pack_forget()
 
 	def forcequit(self, event):
 		self.master.overrideredirect(False)
