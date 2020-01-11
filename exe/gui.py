@@ -1,6 +1,9 @@
 from tkinter import *
+import os
 import copy
 from PIL import Image, ImageTk, ImageGrab
+from tkinter import filedialog
+# from tkFileDialog import asksaveasfilename
 import pyscreenshot
 import solver
 import time
@@ -170,19 +173,14 @@ class board(object):
 		frame.destroy()
 		self.canvas.pack()
 		self.layer_of_text()
-		self.screenshot('Desktop/sudoku')
-
-	def screenshot(self, fileName):
-	    # x=root.winfo_rootx()+widget.winfo_x()
-	    # y=root.winfo_rooty()+widget.winfo_y()
-	    # x1=x+widget.winfo_width()
-	    # y1=y+widget.winfo_height()
-	    # ImageGrab.grab().crop((x,y,x1,y1)).save("/Users/MatthewLam/Desktop/sudoku.png")
-	    # save postscipt image 
-	    self.canvas.postscript(file = fileName + '.eps') 
-	    # use PIL to convert to PNG 
-	    img = Image.open(fileName + '.eps') 
-	    img.save(fileName + '.png', 'png') 
+		abs_pname = filedialog.asksaveasfilename(initialdir='~', title='Select Path to file',filetypes=(('portable network graphics file', '*.png'),))
+		print(abs_pname)
+		if abs_pname == '':
+			return
+		self.canvas.postscript(file=abs_pname+'.eps')
+		img=Image.open(abs_pname+'.eps')
+		img.save(abs_pname,'png')
+		os.remove('/'.join(abs_pname.split('/')[:-1]) +'/'+abs_pname.split('/')[-1]+'.eps')
 
 
 
