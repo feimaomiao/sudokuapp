@@ -2,6 +2,8 @@ from tkinter import *
 from tkinter import filedialog
 from PIL import Image, ImageTk, ImageGrab
 import os, copy, solver, time, random
+
+
 class boardDimensions(object):
 	def __init__(self):
 		self.x = self.x_ranges()
@@ -39,8 +41,8 @@ class boardDimensions(object):
 		return r
 
 
-def initialise(root):
-	root.title('sudoku')
+def initialise(root, name='sudoku-solver'):
+	root.title(name)
 	root.resizable(False, False)
 	root.minsize(453,435)
 	root.update_idletasks()
@@ -50,16 +52,17 @@ def initialise(root):
 	x = (root.winfo_screenwidth() // 2) - (width // 2)
 	y = (root.winfo_screenheight() // 2) - (height // 2)
 	root.geometry('{}x{}+{}+{}'.format(width, height, x, y))
-	print(x, y)
 	return (x, y)
 
 class board(object):
-	def __init__(self, master):
+	def __init__(self):
 		self.solvable = False
 		self.solving = False
 		self.verbose = False
+		self.generated = False
 		self.print_all = True
-		self.master= master
+		self.master= Tk()
+		initialise(self.master)
 		print(self.master.winfo_x(), self.master.winfo_y())
 		self.solved_list = []
 		self.tries = []
@@ -82,12 +85,14 @@ class board(object):
 		self.canvas.bind('d', lambda action: self.change_focus('<Right>',3))
 		self.canvas.bind('s', lambda action: self.change_focus('<Down>',3))
 		self.canvas.bind('w', lambda action: self.change_focus('<Up>',3))
+		# self.canvas.bind('h', self.help)
 		self.canvas.bind('g', lambda action: self.generate_board())
 		self.canvas.bind('<Left>', lambda action: self.change_focus('<Left>'))
 		self.canvas.bind('<Right>', lambda action: self.change_focus('<Right>'))
 		self.canvas.bind('<Up>', lambda action: self.change_focus('<Up>'))
 		self.canvas.bind('<Down>', lambda action: self.change_focus('<Down>'))
 		self.canvas.bind('<Key>', self.input_numbers)
+		self.master.mainloop()
 
 	def set_nottrue(self, action):
 		action = not(action)
@@ -151,39 +156,36 @@ class board(object):
 		return None
 		
 	def generate_board(self):
+		self.numList = []
 		self.canvas.pack_forget()
 		var = StringVar()
 		frame = Frame(self.master, bg='black')
 		frame.pack(fill=BOTH, expand = 1)
-		easy = Radiobutton(frame, text='easy', command= lambda: var.set('easy'))
-		medium = Radiobutton(frame, text='medium', command= lambda: var.set('medium'))
-		hard= Radiobutton(frame, text='hard', command=lambda: var.set('hard'))
-		insane= Radiobutton(frame, text='insane', command= lambda: var.set('insane'))
+		easy = Radiobutton(frame, text='easy', command= lambda: var.set('easy'),indicatoron = 0)
+		medium = Radiobutton(frame, text='medium', command= lambda: var.set('medium'),indicatoron = 0)
+		hard= Radiobutton(frame, text='hard', command=lambda: var.set('hard'),indicatoron = 0)
+		insane= Radiobutton(frame, text='insane', command= lambda: var.set('insane'),indicatoron = 0)
 		easy.pack()
 		medium.pack()
 		hard.pack()
 		insane.pack()
-		easy.wait_variable(var)
+		hard.wait_variable(var)
 		self.numList= solver.return_generated_board(var.get())
 		frame.destroy()
 		self.canvas.pack()
 		self.layer_of_text()
-		abs_pname = filedialog.asksaveasfilename(initialdir='~', title='Select Path to file',filetypes=(('portable network graphics file', '*.png'),))
-		print(abs_pname)
-		if abs_pname == '':
-			return
-		self.canvas.postscript(file=abs_pname+'.eps')
-		img=Image.open(abs_pname+'.eps')
-		img.save(abs_pname,'png')
-		os.remove('/'.join(abs_pname.split('/')[:-1]) +'/'+abs_pname.split('/')[-1]+'.eps')
-
-
+		self.canvas.postscript(file='temp/temp'+'.eps')
+		img=Image.open('temp/temp.eps')
+		img.save('temp/temp.png', 'png')
+		os.remove('temp/temp.eps')
+		self.generated=True
+		self.forcequit(event=None)
 
 	def forcequit(self, event):
 		self.master.overrideredirect(False)
 		print('quit')
 		self.master.update_idletasks()
-		quit()
+		self.master.destroy()
 
 	def layer_of_text(self):
 		self.canvas.delete('layertext')
@@ -195,7 +197,7 @@ class board(object):
 				if text == 0:
 					text = ' '
 				self.canvas.create_text(xcoordinate.get(j), ycoordinate.get(i), text=text, fill='darkblue',font=('Purisa', 25),anchor=CENTER, tags='layertext')
-		# return None
+		return 
 
 
 	def input_numbers(self, event):
@@ -260,10 +262,13 @@ class board(object):
 		self.selected = (x, y)
 		return 
 
+class play_board:
+	def __init__(self, board):
+		self.master = Tk()
+		self.initialise(self.master)
+		self.master.mainloop()
 
 if __name__ == '__main__':
-	root = Tk()
-	initialise(root)
-	sudokuB = board(root)
-	sudokuB.layer_of_text()
-	root.mainloop()
+	sudokuB = board()
+	if not sudokuB.generated:
+		raise SystemExit
