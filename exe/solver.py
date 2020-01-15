@@ -142,7 +142,7 @@ def return_generated_board(difficulty='easy',board=[]):
 		rm_x = random.randrange(9)
 		rm_y = random.randrange(9)
 		rboard[rm_x][rm_y]=0
-	return rboard
+	return (rboard,rboard_obj)
 
 
 

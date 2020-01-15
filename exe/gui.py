@@ -170,7 +170,7 @@ class board(object):
 		hard.pack()
 		insane.pack()
 		hard.wait_variable(var)
-		self.numList= solver.return_generated_board(var.get())
+		self.numList, correct_= solver.return_generated_board(var.get())
 		frame.destroy()
 		self.canvas.pack()
 		self.layer_of_text()
@@ -265,7 +265,8 @@ class board(object):
 class play_board:
 	def __init__(self, board):
 		self.master = Tk()
-		self.initialise(self.master)
+		self.initialise(self.master, name='sudoku-play')
+		self.canvas = Canvas(self.master, name='sudoku-game')
 		self.master.mainloop()
 
 if __name__ == '__main__':
