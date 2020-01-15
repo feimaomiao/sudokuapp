@@ -1,11 +1,10 @@
-import copy, random		
+import copy, random, os
 
 
 class sudoku_board(object):
 	def __init__(self, board):
 		# Make copy instead of direct modify
 		self.board = copy.deepcopy(board)
-
 		self.tried = []
 		# Check if user inputted a valid board
 		self.finished = self.check_valid()
@@ -24,16 +23,19 @@ class sudoku_board(object):
 		# Checks if number is valid in certain position
 		# horizontal
 		for i in range(len(self.board[0])):
-			if self.board[position[0]][i] == number and position[1]!= i:	return False
+			if self.board[position[0]][i] == number and position[1]!= i:	
+				return False
 		# vertical
 		for i in range(len(self.board[0])):
-			if self.board[i][position[1]] == number and position[0]!= i:	return False
+			if self.board[i][position[1]] == number and position[0]!= i:	
+				return False
 		# groups	
 		xpos = position[1] //3
 		ypos = position[0] //3
 		for i in range(ypos*3, ypos*3+3):
 			for j in range(xpos*3,xpos*3+3):
-				if self.board[i][j] == number and (i,j)!= position:			return False
+				if self.board[i][j] == number and (i,j)!= position:			
+					return False
 		return True
 
 
