@@ -187,8 +187,9 @@ class board(object):
 		for i in sorted(frame.children):
 			frame.children[i].pack()
 		hard.wait_variable(var)
-		label= Label(frame, text='Please wait for up till 15 seconds')
-		label.pack()
+		label= Label(frame, text='Please wait for up till 15 seconds', bg='white',fg='green')
+		label.place(x=100,y=200)
+		self.master.after(100)
 		self.numList, self.correct= solver.return_generated_board(var.get())
 		print(self.numList, self.correct)
 		frame.destroy()
