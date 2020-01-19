@@ -179,7 +179,10 @@ class board(object):
 		img.save('temp/temp.png', 'png')
 		os.remove('temp/temp.eps')
 		self.generated=True
-		self.forcequit(event=None)
+		self.master.overrideredirect(False)
+		print('quit')
+		self.master.update_idletasks()
+		self.master.destroy()
 
 	def forcequit(self, event):
 		self.master.overrideredirect(False)
@@ -235,7 +238,12 @@ class board(object):
 		transformed = self.transform(self.numList)
 		sudokuboard = solver.sudoku_board(transformed)
 		self.solvable = sudokuboard.finished
-		try:				self.tried = sudokuboard.tried if self.verbose else random.sample(sudokuboard.tried,random.randrange(20,100))
+		print(sudokuboard.tried)
+		try:				
+			if self.verbose:
+				self.tried = sudokuboard.tried 
+			else:
+				self.tried=random.sample(sudokuboard.tried,random.randrange(20,100))
 		except ValueError:	pass
 		self.solved_list = sudokuboard.board
 		self.output()
@@ -262,14 +270,27 @@ class board(object):
 		self.selected = (x, y)
 		return 
 
-class play_board:
+class play_board(object):
 	def __init__(self, board):
 		self.master = Tk()
-		self.initialise(self.master, name='sudoku-play')
+		self.board_unsolved = board
+		initialise(self.master, name='sudoku-play')
 		self.canvas = Canvas(self.master, name='sudoku-game')
+		self.canvas = Canvas(self.master,width=453,height=435)
+		self.image= ImageTk.PhotoImage(Image.open('temp/temp.png'))
+		self.canvas.create_image(0,0,anchor=NW,image=self.image)
+		self.canvas.pack()
+		self.canvas.focus_set()
+		self.canvas.bind('q', self.forcequit)
 		self.master.mainloop()
 
+	def forcequit(self, event):
+		self.master.overrideredirect(False)
+		print('quit')
+		self.master.update_idletasks()
+		self.master.destroy()
 if __name__ == '__main__':
 	sudokuB = board()
 	if not sudokuB.generated:
 		raise SystemExit
+	thing = play_board(sudokuB.numList)
