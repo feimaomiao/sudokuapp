@@ -10,9 +10,6 @@ class sudoku_board(object):
 		self.finished = self.check_valid()
 		self.solve() if self.finished else None
 
-	def __repr__(self):
-		return self.board
-
 	def find_empty(self):
 		for i in range(9):
 			for j in range(9):
@@ -48,13 +45,15 @@ class sudoku_board(object):
 		for i in range(1,10):
 			# append to try. Try is used in fancy 
 			if self.valid(i,(row,col)):
-				self.tried.append(copy.deepcopy(self.board))
+				if random.choice([1,2])==1:
+					self.tried.append(copy.deepcopy(self.board)) 
 				# check if number is valid
 				self.board[row][col]= i
 				# recursion -- check until all empty files are checked
 				if self.solve():
 					self.finished = True
 					return True
+
 
 				# location is not valid and location returns zero
 				self.board[row][col] = 0
@@ -101,7 +100,9 @@ def return_generated_board(difficulty='easy',board=[]):
 		# function that generates an unsolved board to return as a game
 		board_copy = [[0 for i in range(9)] for i in range(9)]
 		possible = [i for i in range(1,10)]
-		for i in range(15):
+		tester= None
+		for i in range(10):
+			del(tester)
 			print('i',i)
 			# x amd u value (coordinates) of the selected grid
 			x = random.randrange(9)
@@ -112,12 +113,15 @@ def return_generated_board(difficulty='easy',board=[]):
 				board_copy[x][y] = random.choice(possible)
 				tester = sudoku_board(board_copy)
 				# Check if it is a posible number
-				if not tester.check_valid():	board_copy[x][y] = 0
-				else: 							pass
+				if not tester.check_valid():	
+					print('Its the culprit here')
+					board_copy[x][y] = 0
+				else: 							
+					continue
 				# recycles to save space and speeds up the progress
-				del(tester)
 			else:
 				print('Got lucky')
+				tester= None
 				# will continues the loop
 				continue
 		# returns a copy with ~15 grid entered
