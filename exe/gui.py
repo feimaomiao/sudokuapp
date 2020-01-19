@@ -192,6 +192,8 @@ class board(object):
 		# insane.pack()
 		hard.wait_variable(var)
 		self.numList, self.correct= solver.return_generated_board(var.get())
+		time_lable = Label(frame, text='Please wait for up to 15 seconds!')
+		time_lable.pack()
 		print(self.numList, self.correct)
 		frame.destroy()
 		print('Canvas created')
