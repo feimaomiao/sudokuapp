@@ -1,6 +1,4 @@
 import copy, random, os
-
-
 class sudoku_board(object):
 	def __init__(self, board):
 		# Make copy instead of direct modify
@@ -19,18 +17,17 @@ class sudoku_board(object):
 	def valid(self,number, position):
 		# Checks if number is valid in certain position
 		# horizontal
-		for i in range(len(self.board[0])):
+		for i in range(9):
 			if self.board[position[0]][i] == number and position[1]!= i:	
 				return False
-		# vertical
-		for i in range(len(self.board[0])):
 			if self.board[i][position[1]] == number and position[0]!= i:	
 				return False
+		# # vertical
+		# for i in range(9):
 		# groups	
-		xpos = position[1] //3
-		ypos = position[0] //3
-		for i in range(ypos*3, ypos*3+3):
-			for j in range(xpos*3,xpos*3+3):
+		xpos, ypos = (position[1] //3*3, position[0]//3*3)
+		for i in range(ypos, ypos+3):
+			for j in range(xpos,xpos+3):
 				if self.board[i][j] == number and (i,j)!= position:			
 					return False
 		return True
@@ -53,8 +50,6 @@ class sudoku_board(object):
 				if self.solve():
 					self.finished = True
 					return True
-
-
 				# location is not valid and location returns zero
 				self.board[row][col] = 0
 
@@ -80,10 +75,8 @@ class sudoku_board(object):
 
 			# Groups
 			group = []
-			x0 = i%3*3
-			x1 = i%3*3+3
-			y0 = i//3*3
-			y1 = i//3*3 +3
+			x0, x1 = (i%3*3, i%3*3+3)
+			y0, y1 = (i//3*3,i//3*3 +3)
 			for ys in range(y0,y1):
 				for xs in range(x0, x1):
 					group.append(self.board[ys][xs])
@@ -101,7 +94,7 @@ def return_generated_board(difficulty='easy',board=[]):
 		board_copy = [[0 for i in range(9)] for i in range(9)]
 		possible = [i for i in range(1,10)]
 		tester= None
-		for i in range(10):
+		for i in range(15):
 			del(tester)
 			print('i',i)
 			# x amd u value (coordinates) of the selected grid
@@ -124,10 +117,11 @@ def return_generated_board(difficulty='easy',board=[]):
 				tester= None
 				# will continues the loop
 				continue
+
 		# returns a copy with ~15 grid entered
 		return board_copy
 
-	# initialise boards	# 
+	# initialise boards
 	generated_board = board
 	rboard = []
 	amount_of_empty_spots = 0
@@ -137,9 +131,9 @@ def return_generated_board(difficulty='easy',board=[]):
 	rboard_obj.solve()
 	rboard = copy.deepcopy(rboard_obj.board)
 	# assigns the board and empties grids
-	if difficulty == 'easy':		amount_of_empty_spots = random.randrange(15,30)
-	elif difficulty == 'medium':	amount_of_empty_spots = random.randrange(30,45)
-	elif difficulty == 'hard':		amount_of_empty_spots = random.randrange(45,60)
+	if difficulty == 'easy':		amount_of_empty_spots = random.randrange(25,45)
+	elif difficulty == 'medium':	amount_of_empty_spots = random.randrange(35,50)
+	elif difficulty == 'hard':		amount_of_empty_spots = random.randrange(40,60)
 	elif difficulty == 'insane':	amount_of_empty_spots = random.randrange(60, 75)
 	else:							amount_of_empty_spots = random.randrange(15,75)
 	for i in range(amount_of_empty_spots):
