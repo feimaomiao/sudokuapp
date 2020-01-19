@@ -273,11 +273,11 @@ class board(object):
 
 class play_board(object):
 	def __init__(self, board):
-		self.master = Tk()
+		self.dimensions = boardDimensions()
 		self.board_unsolved = board
+		self.master = Tk()
 		initialise(self.master, name='sudoku-play')
 		self.canvas = Canvas(self.master, name='sudoku-game')
-		self.dimensions = boardDimensions()
 		self.canvas = Canvas(self.master,width=453,height=435)
 		self.image= ImageTk.PhotoImage(Image.open('temp/temp.png'))
 		self.canvas.create_image(0,0,anchor=NW,image=self.image)
@@ -288,7 +288,21 @@ class play_board(object):
 		self.master.mainloop()
 
 	def mouseClick(self, event):
-		print(event)
+		self.canvas.delete('current_rectangle')
+		loc_y= None
+		loc_x = None
+		for count, items in enumerate(self.dimensions.x.values()):
+			if event.x in range(items[0], items[1]):
+				loc_x = list(self.dimensions.x.keys())[count]
+				break
+		for count,items in enumerate(self.dimensions.y.values()):
+			if event.y in range(items[0],items[1]):
+				loc_y = list(self.dimensions.y.keys())[count]
+				break
+		print(loc_x,loc_y)
+		if loc_x == None or loc_y == None:
+			print('This is erroor')
+			return
 
 	def forcequit(self, event):
 		os.remove('temp/temp.png')
@@ -296,6 +310,29 @@ class play_board(object):
 		print('quit')
 		self.master.update_idletasks()
 		self.master.destroy()
+
+		# def mouseClick(self, event):
+		# 	self.selected = None
+		# 	print(event.x, event.y)
+		# 	self.canvas.delete('current_rectangle')
+		# 	loc_y= None
+		# 	loc_x = None
+		# 	for count, items in enumerate(self.dimensions.x.values()):
+		# 		if event.x in range(items[0], items[1]):
+		# 			loc_x = list(self.dimensions.x.keys())[count]
+		# 			break
+		# 	for count,items in enumerate(self.dimensions.y.values()):
+		# 		if event.y in range(items[0],items[1]):
+		# 			loc_y = list(self.dimensions.y.keys())[count]
+		# 			break
+		# 	print(loc_x,loc_y)
+		# 	self.master.update_idletasks()
+		# 	self.canvas.focus_set()
+		# 	if loc_x == None or loc_y == None:
+		# 		pass
+		# 	else:
+		# 		self.show_focus(loc_x,loc_y)
+		# 	return None
 if __name__ == '__main__':
 	sudokuB = board()
 	if not sudokuB.generated:

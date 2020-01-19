@@ -1,4 +1,29 @@
 import copy, random, os
+from functools import wraps
+import errno
+import signal
+
+class TimeoutError(Exception):
+    pass
+
+def timeout(seconds=10, error_message=os.strerror(errno.ETIME)):
+    def decorator(func):
+        def _handle_timeout(signum, frame):
+            raise TimeoutError(error_message)
+
+        def wrapper(*args, **kwargs):
+            signal.signal(signal.SIGALRM, _handle_timeout)
+            signal.alarm(seconds)
+            try:
+                result = func(*args, **kwargs)
+            finally:
+                signal.alarm(0)
+            return result
+
+        return wraps(func)(wrapper)
+
+    return decorator
+
 class sudoku_board(object):
 	def __init__(self, board):
 		# Make copy instead of direct modify
@@ -16,20 +41,16 @@ class sudoku_board(object):
 
 	def valid(self,number, position):
 		# Checks if number is valid in certain position
-		# horizontal
 		for i in range(9):
-			if self.board[position[0]][i] == number and position[1]!= i:	
-				return False
-			if self.board[i][position[1]] == number and position[0]!= i:	
-				return False
-		# # vertical
-		# for i in range(9):
+			# horizontal
+			if self.board[position[0]][i] == number and position[1]!= i:	return False
+			# vertical
+			if self.board[i][position[1]] == number and position[0]!= i:	return False
 		# groups	
 		xpos, ypos = (position[1] //3*3, position[0]//3*3)
 		for i in range(ypos, ypos+3):
 			for j in range(xpos,xpos+3):
-				if self.board[i][j] == number and (i,j)!= position:			
-					return False
+				if self.board[i][j] == number and (i,j)!= position:			return False
 		return True
 
 
@@ -42,7 +63,7 @@ class sudoku_board(object):
 		for i in range(1,10):
 			# append to try. Try is used in fancy 
 			if self.valid(i,(row,col)):
-				if random.choice([1,2])==1:
+				if random.choice([1,2,3, 4])==1:
 					self.tried.append(copy.deepcopy(self.board)) 
 				# check if number is valid
 				self.board[row][col]= i
@@ -88,13 +109,13 @@ class sudoku_board(object):
 
 
 def return_generated_board(difficulty='easy',board=[]):
-
-	def generate_unsolved_board():
+	@timeout(10)
+	def generate_unsolved_board(times=20):
 		# function that generates an unsolved board to return as a game
 		board_copy = [[0 for i in range(9)] for i in range(9)]
 		possible = [i for i in range(1,10)]
 		tester= None
-		for i in range(15):
+		for i in range(times):
 			del(tester)
 			print('i',i)
 			# x amd u value (coordinates) of the selected grid
@@ -126,7 +147,11 @@ def return_generated_board(difficulty='easy',board=[]):
 	rboard = []
 	amount_of_empty_spots = 0
 	# can work as a module
-	if board==[]:	generated_board = generate_unsolved_board()
+	if board==[]:	
+		try:
+			generated_board = generate_unsolved_board()
+		except TimeoutError as e:
+			generated_board = generate_unsolved_board(10)
 	rboard_obj = sudoku_board(generated_board)
 	rboard_obj.solve()
 	rboard = copy.deepcopy(rboard_obj.board)
