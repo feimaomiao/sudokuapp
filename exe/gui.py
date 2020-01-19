@@ -19,7 +19,7 @@ class boardDimensions(object):
 		2: (104,149),
 		3: (157,201),
 		4: (203,250),
-		5: (252,295),
+		5: (252,297),
 		6: (303,346),
 		7: (351, 396),
 		8: (398, 445)
@@ -156,6 +156,7 @@ class board(object):
 		return None
 		
 	def generate_board(self):
+		self.canvas.delete('current_rectangle')
 		self.numList = []
 		self.canvas.pack_forget()
 		var = StringVar()
@@ -305,7 +306,6 @@ class play_board(object):
 			return
 		self.show_focus(loc_x, loc_y)
 
-
 	def forcequit(self, event):
 		os.remove('temp/temp.png')
 		self.master.overrideredirect(False)
@@ -319,32 +319,10 @@ class play_board(object):
 		yvalues= self.dimensions.y.get(y)
 		if self.board_unsolved[y][x] != 0:
 			return
-		self.canvas.create_rectangle(xvalues[0],yvalues[0],xvalues[1],yvalues[1],outline='red',tags='current_rectangle',width=5)
+		self.canvas.create_rectangle(xvalues[0],yvalues[0],xvalues[1],yvalues[1],outline='blue',tags='current_rectangle',width=5)
 		self.selected = (x, y)
 		return 	
 
-		# def mouseClick(self, event):
-		# 	self.selected = None
-		# 	print(event.x, event.y)
-		# 	self.canvas.delete('current_rectangle')
-		# 	loc_y= None
-		# 	loc_x = None
-		# 	for count, items in enumerate(self.dimensions.x.values()):
-		# 		if event.x in range(items[0], items[1]):
-		# 			loc_x = list(self.dimensions.x.keys())[count]
-		# 			break
-		# 	for count,items in enumerate(self.dimensions.y.values()):
-		# 		if event.y in range(items[0],items[1]):
-		# 			loc_y = list(self.dimensions.y.keys())[count]
-		# 			break
-		# 	print(loc_x,loc_y)
-		# 	self.master.update_idletasks()
-		# 	self.canvas.focus_set()
-		# 	if loc_x == None or loc_y == None:
-		# 		pass
-		# 	else:
-		# 		self.show_focus(loc_x,loc_y)
-		# 	return None
 if __name__ == '__main__':
 	sudokuB = board()
 	if not sudokuB.generated:
