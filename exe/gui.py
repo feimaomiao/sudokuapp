@@ -274,7 +274,7 @@ class board(object):
 class play_board(object):
 	def __init__(self, board):
 		self.dimensions = boardDimensions()
-		self.board_unsolved = board
+		self.board_unsolved = copy.deepcopy(board)
 		self.master = Tk()
 		initialise(self.master, name='sudoku-play')
 		self.canvas = Canvas(self.master, name='sudoku-game')
@@ -303,6 +303,8 @@ class play_board(object):
 		if loc_x == None or loc_y == None:
 			print('This is erroor')
 			return
+		self.show_focus(loc_x, loc_y)
+
 
 	def forcequit(self, event):
 		os.remove('temp/temp.png')
@@ -310,6 +312,16 @@ class play_board(object):
 		print('quit')
 		self.master.update_idletasks()
 		self.master.destroy()
+
+	def show_focus(self, x ,y):
+		print(x, y)
+		xvalues =self.dimensions.x.get(x)
+		yvalues= self.dimensions.y.get(y)
+		if self.board_unsolved[y][x] != 0:
+			return
+		self.canvas.create_rectangle(xvalues[0],yvalues[0],xvalues[1],yvalues[1],outline='red',tags='current_rectangle',width=5)
+		self.selected = (x, y)
+		return 	
 
 		# def mouseClick(self, event):
 		# 	self.selected = None
