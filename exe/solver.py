@@ -135,7 +135,7 @@ def return_generated_board(difficulty='easy',board=[]):
 	if board==[]:	generated_board = generate_unsolved_board()
 	rboard_obj = sudoku_board(generated_board)
 	rboard_obj.solve()
-	rboard = rboard_obj.board
+	rboard = copy.deepcopy(rboard_obj.board)
 	# assigns the board and empties grids
 	if difficulty == 'easy':		amount_of_empty_spots = random.randrange(15,30)
 	elif difficulty == 'medium':	amount_of_empty_spots = random.randrange(30,45)
@@ -146,7 +146,7 @@ def return_generated_board(difficulty='easy',board=[]):
 		rm_x = random.randrange(9)
 		rm_y = random.randrange(9)
 		rboard[rm_x][rm_y]=0
-	return (rboard,rboard_obj)
+	return (rboard,rboard_obj.board)
 
 
 

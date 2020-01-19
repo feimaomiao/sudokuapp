@@ -170,7 +170,8 @@ class board(object):
 		hard.pack()
 		insane.pack()
 		hard.wait_variable(var)
-		self.numList, correct_= solver.return_generated_board(var.get())
+		self.numList, self.correct= solver.return_generated_board(var.get())
+		print(self.numList, self.correct)
 		frame.destroy()
 		self.canvas.pack()
 		self.layer_of_text()
@@ -276,15 +277,21 @@ class play_board(object):
 		self.board_unsolved = board
 		initialise(self.master, name='sudoku-play')
 		self.canvas = Canvas(self.master, name='sudoku-game')
+		self.dimensions = boardDimensions()
 		self.canvas = Canvas(self.master,width=453,height=435)
 		self.image= ImageTk.PhotoImage(Image.open('temp/temp.png'))
 		self.canvas.create_image(0,0,anchor=NW,image=self.image)
-		self.canvas.pack()
 		self.canvas.focus_set()
 		self.canvas.bind('q', self.forcequit)
+		self.canvas.bind('<Button-1>', self.mouseClick)
+		self.canvas.pack()
 		self.master.mainloop()
 
+	def mouseClick(self, event):
+		print(event)
+
 	def forcequit(self, event):
+		os.remove('temp/temp.png')
 		self.master.overrideredirect(False)
 		print('quit')
 		self.master.update_idletasks()
@@ -293,4 +300,5 @@ if __name__ == '__main__':
 	sudokuB = board()
 	if not sudokuB.generated:
 		raise SystemExit
+	print(sudokuB)
 	thing = play_board(sudokuB.numList)
