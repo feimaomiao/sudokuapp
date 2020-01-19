@@ -42,7 +42,9 @@ class boardDimensions(object):
 
 
 def initialise(root, name='sudoku-solver'):
+	# Set window title
 	root.title(name)
+	# Set the window size and not allow user to change the size
 	root.resizable(False, False)
 	root.minsize(453,435)
 	root.update_idletasks()
@@ -51,29 +53,35 @@ def initialise(root, name='sudoku-solver'):
 	print(root.winfo_screenwidth(), root.winfo_screenheight())
 	x = (root.winfo_screenwidth() // 2) - (width // 2)
 	y = (root.winfo_screenheight() // 2) - (height // 2)
+	# Set root size and put to center
 	root.geometry('{}x{}+{}+{}'.format(width, height, x, y))
 	return (x, y)
 
 class board(object):
 	def __init__(self):
+		# Set user variables
 		self.solvable = False
 		self.solving = False
 		self.verbose = False
 		self.generated = False
 		self.print_all = True
 		self.master= Tk()
+		# Initialises the root window
 		initialise(self.master)
 		print(self.master.winfo_x(), self.master.winfo_y())
 		self.solved_list = []
 		self.tries = []
 		self.selected = None
+		# Add in default numlist
 		self.numList = [[' ' for c in range(9)] for i in range(9)]
 		self.canvas = Canvas(self.master,width=453,height=435)
 		self.image= ImageTk.PhotoImage(Image.open('sudoku.png'))
+		# Put image into canvas
 		self.canvas.create_image(0,0,anchor=NW,image=self.image)
 		self.copy_of_board = []
 		self.canvas.pack()
 		self.dimensions = boardDimensions()
+		# Put focus to canvas and set binding
 		self.canvas.focus_set()
 		self.canvas.bind('<Button-1>',self.mouseClick)
 		self.canvas.bind('<Return>',self.solve)
@@ -92,13 +100,16 @@ class board(object):
 		self.canvas.bind('<Up>', lambda action: self.change_focus('<Up>'))
 		self.canvas.bind('<Down>', lambda action: self.change_focus('<Down>'))
 		self.canvas.bind('<Key>', self.input_numbers)
+		# Mainloop
 		self.master.mainloop()
 
 	def set_nottrue(self, action):
+		# Set action to false
 		action = not(action)
 
 
 	def clear_screen(self):
+		# Re-initialise the window
 		self.numList = [[' ' for c in range(9)] for i in range(9)]
 		self.solvable = False
 		self.solving = False
@@ -107,7 +118,7 @@ class board(object):
 		return
 
 	def change_focus(self, direction,no =1):
-		# print(direction)
+		# Change rectangle with arrow or wasd keys
 		self.canvas.delete('current_rectangle')
 		csx,csy = (0,0) if not self.selected else self.selected
 		if direction == '<Left>':
@@ -133,11 +144,13 @@ class board(object):
 		return
 
 	def mouseClick(self, event):
+		# Sense mouse click to certain location
 		self.selected = None
 		print(event.x, event.y)
 		self.canvas.delete('current_rectangle')
 		loc_y= None
 		loc_x = None
+		# Get location with dimension
 		for count, items in enumerate(self.dimensions.x.values()):
 			if event.x in range(items[0], items[1]):
 				loc_x = list(self.dimensions.x.keys())[count]
@@ -150,30 +163,38 @@ class board(object):
 		self.master.update_idletasks()
 		self.canvas.focus_set()
 		if loc_x == None or loc_y == None:
+			# Clicked on line
 			pass
 		else:
+			# Put a rectangle on board with certaini dimension
 			self.show_focus(loc_x,loc_y)
 		return None
 		
 	def generate_board(self):
 		self.canvas.delete('current_rectangle')
 		self.numList = []
+		# Hide the canvas including the photo
 		self.canvas.pack_forget()
 		var = StringVar()
+		# Create a new frame to ask for the user input.
 		frame = Frame(self.master, bg='black')
 		frame.pack(fill=BOTH, expand = 1)
+		# Add four radiobuttons and set different commannds
 		easy = Radiobutton(frame, text='easy', command= lambda: var.set('easy'),indicatoron = 0)
 		medium = Radiobutton(frame, text='medium', command= lambda: var.set('medium'),indicatoron = 0)
 		hard= Radiobutton(frame, text='hard', command=lambda: var.set('hard'),indicatoron = 0)
 		insane= Radiobutton(frame, text='insane', command= lambda: var.set('insane'),indicatoron = 0)
-		easy.pack()
-		medium.pack()
-		hard.pack()
-		insane.pack()
+		for i in sorted(frame.children):
+			frame.children[i].pack()
+		# easy.pack()
+		# medium.pack()
+		# hard.pack()
+		# insane.pack()
 		hard.wait_variable(var)
 		self.numList, self.correct= solver.return_generated_board(var.get())
 		print(self.numList, self.correct)
 		frame.destroy()
+		print('Canvas created')
 		self.canvas.pack()
 		self.layer_of_text()
 		self.canvas.postscript(file='temp/temp'+'.eps')
