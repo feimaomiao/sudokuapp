@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import filedialog
 from PIL import Image, ImageTk, ImageGrab
-import os, copy, solver, time, random
+import os, copy, time, random
 
 
 class boardDimensions(object):
@@ -76,7 +76,7 @@ class board(object):
 		# Add in default numlist
 		self.numList = [[' ' for c in range(9)] for i in range(9)]
 		self.canvas = Canvas(self.master,width=453,height=435)
-		self.image= ImageTk.PhotoImage(Image.open('sudoku.png'))
+		self.image= ImageTk.PhotoImage(Image.open(os.path.join(os.getcwd(),'exe','sudoku.png')))
 		# Put image into canvas
 		self.canvas.create_image(0,0,anchor=NW,image=self.image)
 		self.copy_of_board = []
@@ -288,62 +288,12 @@ class board(object):
 		yvalues= self.dimensions.y.get(y)
 		self.canvas.create_rectangle(xvalues[0],yvalues[0],xvalues[1],yvalues[1],outline='red',tags='current_rectangle',width=5)
 		self.selected = (x, y)
-		return 
-
-class play_board(object):
-	def __init__(self, board):
-		self.dimensions = boardDimensions()
-		self.board_unsolved = copy.deepcopy(board)
-		self.master = Tk()
-		initialise(self.master, name='sudoku-play')
-		self.canvas = Canvas(self.master, name='sudoku-game')
-		self.canvas = Canvas(self.master,width=453,height=435)
-		self.image= ImageTk.PhotoImage(Image.open('temp/temp.png'))
-		self.canvas.create_image(0,0,anchor=NW,image=self.image)
-		self.canvas.focus_set()
-		self.canvas.bind('q', self.forcequit)
-		self.canvas.bind('<Button-1>', self.mouseClick)
-		self.canvas.pack()
-		self.master.mainloop()
-
-	def mouseClick(self, event):
-		self.canvas.delete('current_rectangle')
-		loc_y= None
-		loc_x = None
-		for count, items in enumerate(self.dimensions.x.values()):
-			if event.x in range(items[0], items[1]):
-				loc_x = list(self.dimensions.x.keys())[count]
-				break
-		for count,items in enumerate(self.dimensions.y.values()):
-			if event.y in range(items[0],items[1]):
-				loc_y = list(self.dimensions.y.keys())[count]
-				break
-		print(loc_x,loc_y)
-		if loc_x == None or loc_y == None:
-			print('This is erroor')
-			return
-		self.show_focus(loc_x, loc_y)
-
-	def forcequit(self, event):
-		os.remove('temp/temp.png')
-		self.master.overrideredirect(False)
-		print('quit')
-		self.master.update_idletasks()
-		self.master.destroy()
-
-	def show_focus(self, x ,y):
-		print(x, y)
-		xvalues =self.dimensions.x.get(x)
-		yvalues= self.dimensions.y.get(y)
-		if self.board_unsolved[y][x] != 0:
-			return
-		self.canvas.create_rectangle(xvalues[0],yvalues[0],xvalues[1],yvalues[1],outline='blue',tags='current_rectangle',width=5)
-		self.selected = (x, y)
 		return  
 
-if __name__ == '__main__':
+def main():
 	sudokuB = board()
 	if not sudokuB.generated:
+		print('Thank you!')
 		raise SystemExit
 	print(sudokuB)
-	thing = play_board(sudokuB.numList)
+	thing = play_board.play_board(sudokuB.numList)
