@@ -1,13 +1,20 @@
+from .gui import boardDimensions, initialise
+import PIL
+# from PIL import Image, ImageTk
+import os
+from tkinter import *
+import copy
 class play_board(object):
 	def __init__(self, board):
 		self.dimensions = boardDimensions()
 		# Do not cahnge. used to check which grid is empty.
 		self.board_unsolved = copy.deepcopy(board)
+		self.board = copy.deepcopy(board)
 		self.master = Tk()
 		initialise(self.master, name='sudoku-play')
 		self.canvas = Canvas(self.master, name='sudoku-game')
 		self.canvas = Canvas(self.master,width=453,height=435)
-		self.image= ImageTk.PhotoImage(Image.open('temp/temp.png'))
+		self.image= PIL.ImageTk.PhotoImage(PIL.Image.open(os.path.join(os.getcwd(),'exe','temp','temp.png')))
 		self.canvas.create_image(0,0,anchor=NW,image=self.image)
 		self.canvas.focus_set()
 		self.canvas.bind('q', self.forcequit)
@@ -34,11 +41,12 @@ class play_board(object):
 		self.show_focus(loc_x, loc_y)
 
 	def forcequit(self, event):
-		os.remove('temp/temp.png')
+		os.remove('exe/temp/temp.png')
 		self.master.overrideredirect(False)
 		print('quit')
 		self.master.update_idletasks()
 		self.master.destroy()
+		raise SystemExit
 
 	def show_focus(self, x ,y):
 		self.selected = None
@@ -54,6 +62,7 @@ class play_board(object):
 	def input_numbers(self, event):
 		if not bool(self.selected) or event.char not in '1234567890':
 			return
-		inputted_num = event.char
+		self.board[x][y] = event.char
+		print(self.board)
 		
 

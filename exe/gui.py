@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import filedialog
 from PIL import Image, ImageTk, ImageGrab
+from .solver import *
 import os, copy, time, random
 
 
@@ -40,8 +41,6 @@ class boardDimensions(object):
 		}
 		return r
 	
-
-
 def initialise(root, name='sudoku-solver'):
 	# Set window title
 	root.title(name)
@@ -57,6 +56,8 @@ def initialise(root, name='sudoku-solver'):
 	# Set root size and put to center
 	root.geometry('{}x{}+{}+{}'.format(width, height, x, y))
 	return (x, y)
+
+from .play_board import play_board
 
 class board(object):
 	def __init__(self):
@@ -188,16 +189,16 @@ class board(object):
 		for i in sorted(frame.children):
 			frame.children[i].pack()
 		hard.wait_variable(var)
-		self.numList, self.correct= solver.return_generated_board(var.get())
+		self.numList, self.correct= return_generated_board(var.get())
 		print(self.numList, self.correct)
 		frame.destroy()
 		print('Canvas created')
 		self.canvas.pack()
 		self.layer_of_text()
-		self.canvas.postscript(file='temp/temp'+'.eps')
-		img=Image.open('temp/temp.eps')
-		img.save('temp/temp.png', 'png')
-		os.remove('temp/temp.eps')
+		self.canvas.postscript(file=os.path.join(os.getcwd(), 'exe/temp/temp')+'.eps')
+		img=Image.open('exe/temp/temp.eps')
+		img.save('exe/temp/temp.png', 'png')
+		os.remove('exe/temp/temp.eps')
 		self.generated=True
 		self.master.overrideredirect(False)
 		print('quit')
@@ -232,7 +233,7 @@ class board(object):
 			copy_of_board = copy.deepcopy(self.numList)
 			copy_of_board[self.selected[1]][self.selected[0]] = inputed
 			copy_of_board = self.transform(copy_of_board)
-			test = solver.sudoku_board(copy_of_board)
+			test = sudoku_board(copy_of_board)
 			if test.finished:
 				self.numList[self.selected[1]][self.selected[0]] = inputed
 				self.layer_of_text()
@@ -256,7 +257,7 @@ class board(object):
 		if self.solving:    return
 		self.solving = True
 		transformed = self.transform(self.numList)
-		sudokuboard = solver.sudoku_board(transformed)
+		sudokuboard = sudoku_board(transformed)
 		self.solvable = sudokuboard.finished
 		print(sudokuboard.tried)
 		try:                
@@ -265,6 +266,7 @@ class board(object):
 			else:
 				self.tried=random.sample(sudokuboard.tried,random.randrange(20,100))
 		except ValueError:  pass
+		print(self.tried)
 		self.solved_list = sudokuboard.board
 		self.output()
 
@@ -296,4 +298,4 @@ def main():
 		print('Thank you!')
 		raise SystemExit
 	print(sudokuB)
-	thing = play_board.play_board(sudokuB.numList)
+	thing = play_board(sudokuB.numList)
