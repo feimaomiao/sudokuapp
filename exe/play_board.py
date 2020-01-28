@@ -9,6 +9,7 @@ class play_board(object):
 		self.dimensions = boardDimensions()
 		# Do not cahnge. used to check which grid is empty.
 		self.board_unsolved = copy.deepcopy(board)
+		# Board that user used to enter numbers[]
 		self.board = copy.deepcopy(board)
 		self.master = Tk()
 		initialise(self.master, name='sudoku-play')
@@ -69,3 +70,17 @@ class play_board(object):
 		self.board[x][y] = event.char
 		print(self.board)
 		print(self.board[x][y])
+		self.print_inputed()
+
+	def print_inputed(self):
+		self.canvas.delete('layertext')
+		xcoordinate = {0: 31,1: 76,2: 127,3: 178,4: 226,5: 276,6: 325,7: 376,8: 420}
+		ycoordinate = {0: 30,1: 76,2: 122,3: 171,4: 216,5: 265,6: 312,7: 357,8: 405}
+		for i in range(9):
+			for j in range(9):
+				if self.board_unsolved[j][i] == 0:
+					text= self.board[j][i]
+					if text == 0:
+						text = ' '
+					self.canvas.create_text(xcoordinate.get(j), ycoordinate.get(i), text=text, fill='green',font=('Purisa', 25),anchor=CENTER, tags='layertext')
+
