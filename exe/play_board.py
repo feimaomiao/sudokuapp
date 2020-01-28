@@ -19,6 +19,7 @@ class play_board(object):
 		self.canvas.focus_set()
 		self.canvas.bind('q', self.forcequit)
 		self.canvas.bind('<Button-1>', self.mouseClick)
+		self.canvas.bind('<Key>', self.input_numbers)
 		self.canvas.pack()
 		self.master.mainloop()
 
@@ -54,6 +55,7 @@ class play_board(object):
 		xvalues =self.dimensions.x.get(x)
 		yvalues= self.dimensions.y.get(y)
 		if self.board_unsolved[y][x] != 0:
+			print('not valid')
 			return
 		self.canvas.create_rectangle(xvalues[0],yvalues[0],xvalues[1],yvalues[1],outline='blue',tags='current_rectangle',width=5)
 		self.selected = (x, y)
@@ -61,8 +63,9 @@ class play_board(object):
 
 	def input_numbers(self, event):
 		if not bool(self.selected) or event.char not in '1234567890':
+			print(event.char)
 			return
+		x, y = self.selected
 		self.board[x][y] = event.char
 		print(self.board)
-		
-
+		print(self.board[x][y])
