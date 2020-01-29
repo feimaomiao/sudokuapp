@@ -285,6 +285,7 @@ class board(object):
 		except ValueError:  
 			pass
 		self.solved_list = sudokuboard.board
+		print(sudokuboard.sum)
 		self.output()
 		return
 
