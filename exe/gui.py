@@ -88,8 +88,8 @@ class board(object):
 		self.canvas.bind('<Button-1>',self.mouseClick)
 		self.canvas.bind('<Return>',self.solve)
 		self.canvas.bind('q',self.forcequit)
-		self.canvas.bind('p', lambda action: self.set_nottrue(self.print_all))
-		self.canvas.bind('v', lambda action: self.set_nottrue(self.verbose))
+		self.canvas.bind('p', lambda action: self.set_nottrue('print_all'))
+		self.canvas.bind('v', lambda action: self.set_nottrue('verbose'))
 		self.canvas.bind('r', lambda action: self.clear_screen())
 		self.canvas.bind('a', lambda action: self.change_focus('<Left>',3))
 		self.canvas.bind('d', lambda action: self.change_focus('<Right>',3))
@@ -106,8 +106,10 @@ class board(object):
 		self.master.mainloop()
 
 	def set_nottrue(self, action):
-		# Set action to false
-		action = not(action)
+		if action == 'verbose':
+			self.verbose = not(self.verbose)
+		else:
+			self.print_all = not(self.print_all)
 
 
 	def clear_screen(self):
@@ -249,7 +251,7 @@ class board(object):
 			rl.append([])
 			for snl in range(9):
 				st = ll[fsl][snl]
-				if st == ' ':   st = '0'
+				if st == ' ' or st == '':   st = '0'
 				rl[fsl].append(int(st))
 		return rl
 
@@ -259,14 +261,14 @@ class board(object):
 		transformed = self.transform(self.numList)
 		sudokuboard = sudoku_board(transformed)
 		self.solvable = sudokuboard.finished
-		print(sudokuboard.tried)
+		print(self.verbose)
+		print(self.print_all)
 		try:                
 			if self.verbose:
 				self.tried = sudokuboard.tried 
 			else:
 				self.tried=random.sample(sudokuboard.tried,random.randrange(20,100))
 		except ValueError:  pass
-		print(self.tried)
 		self.solved_list = sudokuboard.board
 		self.output()
 
@@ -274,7 +276,6 @@ class board(object):
 		if self.tried == None:  self.print_all = False
 		if self.print_all:
 			for lists in self.tried:
-				print(lists)
 				self.numList = []
 				self.numList = lists
 				self.layer_of_text()
