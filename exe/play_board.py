@@ -78,9 +78,11 @@ class play_board(object):
 		ycoordinate = {0: 30,1: 76,2: 122,3: 171,4: 216,5: 265,6: 312,7: 357,8: 405}
 		for i in range(9):
 			for j in range(9):
-				if self.board_unsolved[j][i] == 0:
+				if self.board_unsolved[i][j] == 0:
 					text= self.board[j][i]
 					if text == 0:
 						text = ' '
 					self.canvas.create_text(xcoordinate.get(j), ycoordinate.get(i), text=text, fill='green',font=('Purisa', 25),anchor=CENTER, tags='layertext')
+				else:
+					print(self.board_unsolved[self.selected[0]][self.selected[1]])
 
