@@ -26,9 +26,13 @@ class play_board(object):
 		self.canvas.bind('<Left>', self.move_horizontal)
 		self.canvas.bind('<Right>', self.move_horizontal)
 		self.canvas.bind('<Button-1>', self.mouseClick)
+		self.canvas.bind('<Return>', self.check)
 		self.canvas.bind('<Key>', self.input_numbers)
 		self.canvas.pack()
 		self.master.mainloop()
+
+	def check(self):
+		print(self.board)
 
 	@staticmethod
 	def move_one(l, cur, lr):
@@ -65,6 +69,7 @@ class play_board(object):
 			pos = [i for i in range(9) if self.board_unsolved[self.selected[1]][i] == 0]
 			print(pos)
 			self.show_focus(self.move_one(pos, self.selected[0], keys.get(ord(event.char))), self.selected[1])
+		return
 
 	def move_vertical(self, event):
 		pos = []
