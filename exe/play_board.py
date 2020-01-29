@@ -31,8 +31,14 @@ class play_board(object):
 		self.canvas.pack()
 		self.master.mainloop()
 
-	def check(self):
+	def check(self, event):
 		print(self.board)
+		for i in self.board:
+			for j in i:
+				if j == 0:
+					print('error')
+					return False
+		return True
 
 	@staticmethod
 	def move_one(l, cur, lr):
@@ -148,11 +154,11 @@ class play_board(object):
 			print(event.char)
 			return
 		x, y = self.selected
-		self.board[x][y] = event.char
+		self.board[y][xq] = event.char
 		print(self.board)
 		print(self.board[x][y])
 		text = event.char
-		if text == 0: 
+		if text == '0': 
 			text = ' '
 		tag = 'l{}{}'.format(x,y)
 		print(tag)
