@@ -27,6 +27,7 @@ def timeout(seconds=10, error_message=os.strerror(errno.ETIME)):
 class sudoku_board(object):
 	def __init__(self, board):
 		# Make copy instead of direct modify
+		self.sum = 0
 		self.board = copy.deepcopy(board)
 		self.tried = []
 		# Check if user inputted a valid board
@@ -61,6 +62,7 @@ class sudoku_board(object):
 		else: 			row,col = find
 
 		for i in range(1,10):
+			self.sum += 1
 			# append to try. Try is used in fancy 
 			if self.valid(i,(row,col)):
 				if random.choice([1,2])==1:

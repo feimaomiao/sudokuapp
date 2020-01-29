@@ -6,6 +6,7 @@ from tkinter import *
 import copy
 class play_board(object):
 	def __init__(self, board):
+		self.selected = None
 		self.dimensions = boardDimensions()
 		# Do not cahnge. used to check which grid is empty.
 		self.board_unsolved = copy.deepcopy(board)
@@ -19,13 +20,78 @@ class play_board(object):
 		self.canvas.create_image(0,0,anchor=NW,image=self.image)
 		self.canvas.focus_set()
 		self.canvas.bind('q', self.forcequit)
+		self.canvas.bind('r', self.empty_screen)
+		self.canvas.bind('<Up>', self.move_vertical)
+		self.canvas.bind('<Down>', self.move_vertical)
+		self.canvas.bind('<Left>', self.move_horizontal)
+		self.canvas.bind('<Right>', self.move_horizontal)
 		self.canvas.bind('<Button-1>', self.mouseClick)
 		self.canvas.bind('<Key>', self.input_numbers)
 		self.canvas.pack()
 		self.master.mainloop()
 
+	@staticmethod
+	def move_one(l, cur, lr):
+		current_pos = l.index(cur)
+		if lr:
+			mv = current_pos + 1
+			if mv >= len(l):
+				mv -= len(l)
+		else:
+			mv = current_pos - 1
+			if mv <0:
+				mv += len(l)
+		return l[mv]
+
+
+	def move_horizontal(self, event):
+		pos = []
+		print(ord(event.char))
+		keys = {63235: True, 63234: False}
+		if not bool(self.selected):
+			for j in range(9):
+				for i in range(9):
+					if self.board_unsolved[j][i] ==0:
+						pos.append(i)
+				if len(pos) >= 1:
+					print(pos)
+					break
+			if keys.get(ord(event.char)):
+				k = 0
+			else:
+				k = -1
+			self.show_focus(pos[k], j)
+		else:
+			pos = [i for i in range(9) if self.board_unsolved[self.selected[1]][i] == 0]
+			print(pos)
+			self.show_focus(self.move_one(pos, self.selected[0], keys.get(ord(event.char))), self.selected[1])
+
+	def move_vertical(self, event):
+		pos = []
+		keys = {63232: False, 63233: True}
+		if not bool(self.selected):
+			for j in range(9):
+				for i in range(9):
+					if self.board_unsolved[i][j] == 0:
+						pos.append(i)
+				if len(pos)>= 1:
+					print(pos)
+					break
+			print(ord(event.char))
+			if not keys.get(ord(event.char)):
+				k = -1
+			else:
+				k = 0
+			self.show_focus(j, pos[k])
+		else:
+			print(self.selected)
+			pos = [i for i in range(9) if self.board_unsolved[i][self.selected[0]] == 0]
+			print(pos)
+			self.show_focus(self.selected[0], self.move_one(pos, self.selected[1], keys.get(ord(event.char))))
+		return
+
+
 	def mouseClick(self, event):
-		self.canvas.delete('current_rectangle')
 		loc_y= None
 		loc_x = None
 		for count, items in enumerate(self.dimensions.x.values()):
@@ -39,8 +105,10 @@ class play_board(object):
 		print(loc_x,loc_y)
 		if loc_x == None or loc_y == None:
 			print('This is erroor')
+			self.selected = None
 			return
 		self.show_focus(loc_x, loc_y)
+		return
 
 	def forcequit(self, event):
 		os.remove('exe/temp/temp.png')
@@ -50,20 +118,27 @@ class play_board(object):
 		self.master.destroy()
 		quit()
 		
+	def empty_screen(self, event):
+		self.board = copy.deepcopy(self.board_unsolved)
+		self.canvas.delete('inputnums')
+		print(self.board)
 
 	def show_focus(self, x ,y):
 		self.selected = None
+		self.canvas.delete('current_rectangle')
 		print(x, y)
 		xvalues =self.dimensions.x.get(x)
 		yvalues= self.dimensions.y.get(y)
 		if self.board_unsolved[y][x] != 0:
 			print('not valid')
-			return
+			return False
 		self.canvas.create_rectangle(xvalues[0],yvalues[0],xvalues[1],yvalues[1],outline='blue',tags='current_rectangle',width=5)
 		self.selected = (x, y)
-		return 
+		return
 
 	def input_numbers(self, event):
+		xcoordinate = {0: 31,1: 76,2: 127,3: 178,4: 226,5: 276,6: 325,7: 376,8: 420}
+		ycoordinate = {0: 30,1: 76,2: 122,3: 171,4: 216,5: 265,6: 312,7: 357,8: 405}
 		if not bool(self.selected) or event.char not in '1234567890':
 			print(event.char)
 			return
@@ -71,19 +146,14 @@ class play_board(object):
 		self.board[x][y] = event.char
 		print(self.board)
 		print(self.board[x][y])
-		self.print_inputed()
+		text = event.char
+		if text == 0: 
+			text = ' '
+		tag = 'l{}{}'.format(x,y)
+		print(tag)
+		self.canvas.delete(str(tag))
+		self.canvas.create_text(xcoordinate.get(x), ycoordinate.get(y), text=text, fill='green', font=('Purisa', 25), anchor=CENTER, tags=(str(tag), 'inputnums'))
+		return
 
-	def print_inputed(self):
-		self.canvas.delete('layertext')
-		xcoordinate = {0: 31,1: 76,2: 127,3: 178,4: 226,5: 276,6: 325,7: 376,8: 420}
-		ycoordinate = {0: 30,1: 76,2: 122,3: 171,4: 216,5: 265,6: 312,7: 357,8: 405}
-		for i in range(9):
-			for j in range(9):
-				if self.board_unsolved[i][j] == 0:
-					text= self.board[j][i]
-					if text == 0:
-						text = ' '
-					self.canvas.create_text(xcoordinate.get(j), ycoordinate.get(i), text=text, fill='green',font=('Purisa', 25),anchor=CENTER, tags='layertext')
-				else:
-					print(self.board_unsolved[self.selected[0]][self.selected[1]])
+
 
