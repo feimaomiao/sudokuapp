@@ -48,7 +48,8 @@ class play_board(object):
 		print('quit')
 		self.master.update_idletasks()
 		self.master.destroy()
-		raise SystemExit
+		quit()
+		
 
 	def show_focus(self, x ,y):
 		self.selected = None

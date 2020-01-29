@@ -87,7 +87,7 @@ class board(object):
 		self.canvas.focus_set()
 		self.canvas.bind('<Button-1>',self.mouseClick)
 		self.canvas.bind('<Return>',self.solve)
-		self.canvas.bind('q',self.forcequit)
+		self.quitbind = self.canvas.bind('q',self.forcequit)
 		self.canvas.bind('p', lambda action: self.set_nottrue('print_all'))
 		self.canvas.bind('v', lambda action: self.set_nottrue('verbose'))
 		self.canvas.bind('r', lambda action: self.clear_screen())
@@ -110,6 +110,7 @@ class board(object):
 			self.verbose = not(self.verbose)
 		else:
 			self.print_all = not(self.print_all)
+		return
 
 
 	def clear_screen(self):
@@ -173,45 +174,56 @@ class board(object):
 			# Put a rectangle on board with certaini dimension
 			self.show_focus(loc_x,loc_y)
 		return None
-		
+	
 	def generate_board(self):
-		self.canvas.delete('current_rectangle')
-		self.numList = []
-		# Hide the canvas including the photo
-		self.canvas.pack_forget()
-		var = StringVar()
-		# Create a new frame to ask for the user input.
-		frame = Frame(self.master, bg='black')
-		frame.pack(fill=BOTH, expand = 1)
-		# Add four radiobuttons and set different commannds
-		easy = Radiobutton(frame, text='easy', command= lambda: var.set('easy'),indicatoron = 0)
-		medium = Radiobutton(frame, text='medium', command= lambda: var.set('medium'),indicatoron = 0)
-		hard= Radiobutton(frame, text='hard', command=lambda: var.set('hard'),indicatoron = 0)
-		insane= Radiobutton(frame, text='insane', command= lambda: var.set('insane'),indicatoron = 0)
-		for i in sorted(frame.children):
-			frame.children[i].pack()
-		hard.wait_variable(var)
-		self.numList, self.correct= return_generated_board(var.get())
-		print(self.numList, self.correct)
-		frame.destroy()
-		print('Canvas created')
-		self.canvas.pack()
-		self.layer_of_text()
-		self.canvas.postscript(file=os.path.join(os.getcwd(), 'exe/temp/temp')+'.eps')
-		img=Image.open('exe/temp/temp.eps')
-		img.save('exe/temp/temp.png', 'png')
-		os.remove('exe/temp/temp.eps')
-		self.generated=True
-		self.master.overrideredirect(False)
-		print('quit')
-		self.master.update_idletasks()
-		self.master.destroy()
+		try:
+			self.canvas.delete('current_rectangle')
+			self.canvas.unbind("q")
+			self.numList = []
+			# Hide the canvas including the photo
+			self.canvas.pack_forget()
+			var = StringVar()
+			# Create a new frame to ask for the user input.
+			frame = Frame(self.master, bg='black')
+			frame.pack(fill=BOTH, expand = 1)
+			# Add four radiobuttons and set different commannds
+			easy = Radiobutton(frame, text='easy', command= lambda: var.set('easy'),indicatoron = 0)
+			medium = Radiobutton(frame, text='medium', command= lambda: var.set('medium'),indicatoron = 0)
+			hard= Radiobutton(frame, text='hard', command=lambda: var.set('hard'),indicatoron = 0)
+			insane= Radiobutton(frame, text='insane', command= lambda: var.set('insane'),indicatoron = 0)
+			for i in sorted(frame.children):
+				frame.children[i].pack()
+			hard.wait_variable(var)
+			self.numList, self.correct= return_generated_board(var.get())
+			print(self.numList, self.correct)
+			frame.destroy()
+			print('Canvas created')
+			self.canvas.pack()
+			self.layer_of_text()
+			self.canvas.postscript(file=os.path.join(os.getcwd(), 'exe/temp/temp')+'.eps')
+			img=Image.open('exe/temp/temp.eps')
+			img.save('exe/temp/temp.png', 'png')
+			os.remove('exe/temp/temp.eps')
+			self.generated=True
+			self.master.overrideredirect(False)
+			print('quit')
+			self.master.update_idletasks()
+			self.master.destroy()
+			return
+		except SystemExit:
+			print('it doesnt work')
+			hard.set('hard')
+		except TimeoutError:
+			hard.set('hard')
+			print('go')
+			quit()
 
 	def forcequit(self, event):
 		self.master.overrideredirect(False)
 		print('quit')
 		self.master.update_idletasks()
 		self.master.destroy()
+		return
 
 	def layer_of_text(self):
 		self.canvas.delete('layertext')
@@ -228,10 +240,11 @@ class board(object):
 
 	def input_numbers(self, event):
 		# lets user input number
-		if not self.selected or event.char not in '0123456789' or self.solving: return
+		if not self.selected or event.char not in '0123456789' or self.solving: pass
 		else: 
 			inputed = event.char
-			if inputed == '0':      inputed = ' '
+			if inputed == '0':      
+				inputed = ' '
 			copy_of_board = copy.deepcopy(self.numList)
 			copy_of_board[self.selected[1]][self.selected[0]] = inputed
 			copy_of_board = self.transform(copy_of_board)
@@ -239,9 +252,10 @@ class board(object):
 			if test.finished:
 				self.numList[self.selected[1]][self.selected[0]] = inputed
 				self.layer_of_text()
-			else:   pass
+			else:   
+				pass
 			del(test)
-			return
+		return
 
 	@staticmethod
 	def transform(ll):
@@ -268,9 +282,11 @@ class board(object):
 				self.tried = sudokuboard.tried 
 			else:
 				self.tried=random.sample(sudokuboard.tried,random.randrange(20,100))
-		except ValueError:  pass
+		except ValueError:  
+			pass
 		self.solved_list = sudokuboard.board
 		self.output()
+		return
 
 	def output(self):
 		if self.tried == None:  self.print_all = False
@@ -283,6 +299,7 @@ class board(object):
 				self.master.update_idletasks()
 		self.numList = self.solved_list
 		self.layer_of_text()
+		return
 
 	def show_focus(self, x ,y):
 		if self.solving:    return
