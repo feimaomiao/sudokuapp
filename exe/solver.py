@@ -63,7 +63,7 @@ class sudoku_board(object):
 		for i in range(1,10):
 			# append to try. Try is used in fancy 
 			if self.valid(i,(row,col)):
-				if random.choice([1,2,3,4])==1:
+				if random.choice([1,2])==1:
 					self.tried.append(copy.deepcopy(self.board)) 
 				# check if number is valid
 				self.board[row][col]= i
@@ -109,7 +109,7 @@ class sudoku_board(object):
 
 
 def return_generated_board(difficulty='easy',board=[]):
-	@timeout(10)
+	@timeout(5)
 	def generate_unsolved_board(times=20):
 		# function that generates an unsolved board to return as a game
 		board_copy = [[0 for i in range(9)] for i in range(9)]
