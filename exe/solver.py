@@ -152,10 +152,13 @@ def return_generated_board(difficulty='easy',board=[]):
 	if board==[]:	
 		try:
 			generated_board = generate_unsolved_board()
+		# Function timeouts at around 5 seconds
 		except TimeoutError as e:
 			generated_board = generate_unsolved_board(10)
 	rboard_obj = sudoku_board(generated_board)
+	# Solves the board
 	rboard_obj.solve()
+	# Creates a copy of the board
 	rboard = copy.deepcopy(rboard_obj.board)
 	# assigns the board and empties grids
 	if difficulty == 'easy':		amount_of_empty_spots = random.randrange(25,45)

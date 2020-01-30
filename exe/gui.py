@@ -231,30 +231,35 @@ class board(object):
 		ycoordinate = {0: 30,1: 76,2: 122,3: 171,4: 216,5: 265,6: 312,7: 357,8: 405}
 		for i in range(9):
 			for j in range(9):
-				text =self.numList[i][j]
-				if text == 0:
-					text = ' '
+				text =self.numList[i][j] if self.numList[i][j] != 0 else ' '
 				self.canvas.create_text(xcoordinate.get(j), ycoordinate.get(i), text=text, fill='darkblue',font=('Purisa', 25),anchor=CENTER, tags='layertext')
 		return 
 
-
+	@timeout(2)
 	def input_numbers(self, event):
-		# lets user input number
-		if not self.selected or event.char not in '0123456789' or self.solving: pass
-		else: 
-			inputed = event.char
-			if inputed == '0':      
-				inputed = ' '
-			copy_of_board = copy.deepcopy(self.numList)
-			copy_of_board[self.selected[1]][self.selected[0]] = inputed
-			copy_of_board = self.transform(copy_of_board)
-			test = sudoku_board(copy_of_board)
-			if test.finished:
+		try:
+			# lets user input number
+			if not self.selected or event.char not in '0123456789' or self.solving: pass
+			else: 
+				inputed = event.char
+				if inputed == '0':      
+					inputed = ' '
+				# copy_of_board = copy.deepcopy(self.numList)
+				# copy_of_board[self.selected[1]][self.selected[0]] = inputed
+				# copy_of_board = self.transform(copy_of_board)
+				# test = sudoku_board(copy_of_board)
 				self.numList[self.selected[1]][self.selected[0]] = inputed
-				self.layer_of_text()
-			else:   
-				return
-		return
+				self.numList  = self.transform(self.numList)
+				test = sudoku_board(self.numList)
+				if test.finished:
+					self.numList[self.selected[1]][self.selected[0]] = inputed
+					self.layer_of_text()
+				else:   
+					self.numList[self.selected[1]][self.selected[0]] = 0
+					self.layer_of_text()
+			
+		except TimeoutError:
+			pass
 
 	@staticmethod
 	def transform(ll):
