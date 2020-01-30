@@ -1,5 +1,6 @@
 from .gui import boardDimensions, initialise
 import PIL
+from .solver import sudoku_board
 # from PIL import Image, ImageTk
 import os
 from tkinter import *
@@ -9,6 +10,8 @@ class play_board(object):
 		self.selected = None
 		self.dimensions = boardDimensions()
 		# Do not cahnge. used to check which grid is empty.
+		# board = [[1,1,1,1,1,1,1,1,0]]+ [[0,0,0,0,0,0,0,0,1] for i in range(8)]
+		# print(board)
 		self.board_unsolved = copy.deepcopy(board)
 		# Board that user used to enter numbers[]
 		self.board = copy.deepcopy(board)
@@ -38,7 +41,23 @@ class play_board(object):
 				if j == 0:
 					print('error')
 					return False
-		return True
+		self.check_solve()
+
+	@staticmethod
+	def toint(board):
+		m = [[0 for i in range(9)] for j in range(9)]
+		for i in range(9):
+			for j in range(9):
+				m[i][j] = int(board[i][j])
+		return m
+
+
+	def check_solve(self):
+		self.board= self.toint(self.board)
+		suboard = sudoku_board(self.board)
+		solved = suboard.finished
+		print(solved)
+
 
 	@staticmethod
 	def move_one(l, cur, lr):
@@ -154,7 +173,7 @@ class play_board(object):
 			print(event.char)
 			return
 		x, y = self.selected
-		self.board[y][xq] = event.char
+		self.board[y][x] = event.char
 		print(self.board)
 		print(self.board[x][y])
 		text = event.char

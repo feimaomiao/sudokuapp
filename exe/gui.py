@@ -253,8 +253,7 @@ class board(object):
 				self.numList[self.selected[1]][self.selected[0]] = inputed
 				self.layer_of_text()
 			else:   
-				pass
-			del(test)
+				return
 		return
 
 	@staticmethod
@@ -318,3 +317,4 @@ def main():
 		raise SystemExit
 	print(sudokuB)
 	thing = play_board(sudokuB.numList)
+	quit()
