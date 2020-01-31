@@ -1,5 +1,5 @@
 from tkinter import *
-# import tkinter.font
+from tkinter import messagebox
 from tkinter import filedialog
 from tkinter import font
 from PIL import Image, ImageTk, ImageGrab
@@ -276,8 +276,11 @@ class board(object):
 		return rl
 
 	def solve(self, event):
-		if self.solving:    return
+		if self.solving:    
+			return
+		starttime = time.time()
 		self.solving = True
+		self.show_focus(0, 0)
 		transformed = self.transform(self.numList)
 		sudokuboard = sudoku_board(transformed)
 		self.solvable = sudokuboard.finished
@@ -291,11 +294,11 @@ class board(object):
 		except ValueError:  
 			pass
 		self.solved_list = sudokuboard.board
-		print(sudokuboard.sum)
-		self.output()
+		# print(sudokuboard.sum)
+		self.output(starttime = starttime)
 		return
 
-	def output(self):
+	def output(self, starttime):
 		try:
 			if self.tried == None: 
 				self.print_all = False
@@ -310,10 +313,14 @@ class board(object):
 				self.master.update_idletasks()
 		self.numList = self.solved_list
 		self.layer_of_text()
+		messagebox.showinfo("Information", "Your board has been solved.\n{} seconds used".format(time.time()-starttime))
+		self.canvas.focus_force()
 		return
 
 	def show_focus(self, x ,y):
-		if self.solving:    return
+		if self.solving:    
+			self.canvas.delete('current_rectangle')
+			return
 		print(x, y)
 		xvalues =self.dimensions.x.get(x)
 		yvalues= self.dimensions.y.get(y)

@@ -60,7 +60,7 @@ class play_board(object):
 		print(solved)
 		if solved:
 			self.master.withdraw()
-			messagebox.showinfo("Information", "Congratulations! You successfully solved the board")
+			messagebox.showinfo("Information", "Congratulations! You successfully solved the board\nYou solved this box in {} seconds".format(round(time.time()-self.starttime)))
 			quit()
 		else:
 			self.master.withdraw()
