@@ -6,6 +6,7 @@ from PIL import Image, ImageTk, ImageGrab
 from .solver import *
 import os, copy, time, random
 
+font1 = "Courier 12"
 
 class boardDimensions(object):
 	def __init__(self):
@@ -203,6 +204,9 @@ class board(object):
 			print('Canvas created')
 			self.canvas.pack()
 			self.layer_of_text()
+			self.master.tk.call('set','fontmap(%s)'%font1, 'Purisa 25 bold')
+			res = self.master.tk.call('array', 'get', 'fontmap')
+			print(res)
 			self.canvas.postscript(fontmap='fontMap',colormode='color',file=os.path.join(os.getcwd(), 'exe/temp/temp')+'.eps')
 			img=Image.open('exe/temp/temp.eps')
 			img.save('exe/temp/temp.png', 'png')
@@ -247,10 +251,6 @@ class board(object):
 				inputed = event.char
 				if inputed == '0':      
 					inputed = ' '
-				# copy_of_board = copy.deepcopy(self.numList)
-				# copy_of_board[self.selected[1]][self.selected[0]] = inputed
-				# copy_of_board = self.transform(copy_of_board)
-				# test = sudoku_board(copy_of_board)
 				self.numList[self.selected[1]][self.selected[0]] = inputed
 				self.numList  = self.transform(self.numList)
 				test = sudoku_board(self.numList)
@@ -260,7 +260,6 @@ class board(object):
 				else:   
 					self.numList[self.selected[1]][self.selected[0]] = 0
 					self.layer_of_text()
-			
 		except TimeoutError:
 			pass
 

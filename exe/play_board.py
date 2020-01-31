@@ -1,4 +1,4 @@
-import PIL, os, copy
+import PIL, os, copy, time
 from .gui import boardDimensions, initialise
 from .solver import sudoku_board
 from tkinter import font
@@ -6,6 +6,7 @@ from tkinter import messagebox
 from tkinter import *
 class play_board(object):
 	def __init__(self, board):
+		self.starttime = time.time()
 		self.selected = None
 		self.dimensions = boardDimensions()
 		# Do not cahnge. used to check which grid is empty.
@@ -39,7 +40,7 @@ class play_board(object):
 		for i in self.board:
 			for j in i:
 				if j == 0:
-					print('error')
+					messagebox.showerror("You have not finished this puzzle yet!")
 					return False
 		self.check_solve()
 
@@ -63,7 +64,7 @@ class play_board(object):
 			quit()
 		else:
 			self.master.withdraw()
-			messagebox.showinfo("Warning", "Whooops! Some of the numbers are not entered properly!")
+			messagebox.showwarning("Warning", "Whooops! Some of the numbers are not entered properly!")
 			self.master.deiconify()
 		return
 

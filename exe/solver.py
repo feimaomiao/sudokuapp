@@ -154,7 +154,11 @@ def return_generated_board(difficulty='easy',board=[]):
 			generated_board = generate_unsolved_board()
 		# Function timeouts at around 5 seconds
 		except TimeoutError as e:
-			generated_board = generate_unsolved_board(10)
+			try:
+				generated_board = generate_unsolved_board(10)
+			# If the computer is so slow
+			except TimeoutError:
+				generated_board = generate_unsolved_board(5)
 	rboard_obj = sudoku_board(generated_board)
 	# Solves the board
 	rboard_obj.solve()
