@@ -1,10 +1,9 @@
+import PIL, os, copy
 from .gui import boardDimensions, initialise
-import PIL
 from .solver import sudoku_board
-# from PIL import Image, ImageTk
-import os
+from tkinter import font
+from tkinter import messagebox
 from tkinter import *
-import copy
 class play_board(object):
 	def __init__(self, board):
 		self.selected = None
@@ -31,6 +30,7 @@ class play_board(object):
 		self.canvas.bind('<Button-1>', self.mouseClick)
 		self.canvas.bind('<Return>', self.check)
 		self.canvas.bind('<Key>', self.input_numbers)
+		self.font = font.Font(family='Purisa', size=25, weight='bold')
 		self.canvas.pack()
 		self.master.mainloop()
 
@@ -57,6 +57,15 @@ class play_board(object):
 		suboard = sudoku_board(self.board)
 		solved = suboard.finished
 		print(solved)
+		if solved:
+			self.master.withdraw()
+			messagebox.showinfo("Information", "Congratulations! You successfully solved the board")
+			quit()
+		else:
+			self.master.withdraw()
+			messagebox.showinfo("Warning", "Whooops! Some of the numbers are not entered properly!")
+			self.master.deiconify()
+		return
 
 
 	@staticmethod
@@ -182,7 +191,7 @@ class play_board(object):
 		tag = 'l{}{}'.format(x,y)
 		print(tag)
 		self.canvas.delete(str(tag))
-		self.canvas.create_text(xcoordinate.get(x), ycoordinate.get(y), text=text, fill='green', font=('Purisa', 25), anchor=CENTER, tags=(str(tag), 'inputnums'))
+		self.canvas.create_text(xcoordinate.get(x), ycoordinate.get(y), text=text, fill='green', font=self.font, anchor=CENTER, tags=(str(tag), 'inputnums'))
 		return
 
 

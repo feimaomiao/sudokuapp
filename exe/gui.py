@@ -1,5 +1,7 @@
 from tkinter import *
+# import tkinter.font
 from tkinter import filedialog
+from tkinter import font
 from PIL import Image, ImageTk, ImageGrab
 from .solver import *
 import os, copy, time, random
@@ -68,6 +70,7 @@ class board(object):
 		self.generated = False
 		self.print_all = True
 		self.master= Tk()
+		self.font = font.Font(family='Purisa', size=25, weight='bold')
 		# Initialises the root window
 		initialise(self.master)
 		print(self.master.winfo_x(), self.master.winfo_y())
@@ -200,7 +203,7 @@ class board(object):
 			print('Canvas created')
 			self.canvas.pack()
 			self.layer_of_text()
-			self.canvas.postscript(file=os.path.join(os.getcwd(), 'exe/temp/temp')+'.eps')
+			self.canvas.postscript(fontmap='fontMap',colormode='color',file=os.path.join(os.getcwd(), 'exe/temp/temp')+'.eps')
 			img=Image.open('exe/temp/temp.eps')
 			img.save('exe/temp/temp.png', 'png')
 			os.remove('exe/temp/temp.eps')
@@ -232,7 +235,7 @@ class board(object):
 		for i in range(9):
 			for j in range(9):
 				text =self.numList[i][j] if self.numList[i][j] != 0 else ' '
-				self.canvas.create_text(xcoordinate.get(j), ycoordinate.get(i), text=text, fill='darkblue',font=('Purisa', 25),anchor=CENTER, tags='layertext')
+				self.canvas.create_text(xcoordinate.get(j), ycoordinate.get(i), text=text, fill='darkblue',font=self.font,anchor=CENTER, tags='layertext')
 		return 
 
 	@timeout(2)
@@ -294,7 +297,11 @@ class board(object):
 		return
 
 	def output(self):
-		if self.tried == None:  self.print_all = False
+		try:
+			if self.tried == None: 
+				self.print_all = False
+		except AttributeError:
+			self.print_all= False
 		if self.print_all:
 			for lists in self.tried:
 				self.numList = []
