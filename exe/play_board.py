@@ -60,11 +60,11 @@ class play_board(object):
 		print(solved)
 		if solved:
 			self.master.withdraw()
-			messagebox.showinfo("Information", "Congratulations! You successfully solved the board\nYou solved this box in {} seconds".format(round(time.time()-self.starttime)))
+			messagebox.showinfo("Success!", "Congratulations! You successfully solved the board\nYou solved this box in {} seconds".format(round(time.time()-self.starttime)))
 			quit()
 		else:
 			self.master.withdraw()
-			messagebox.showwarning("Warning", "Whooops! Some of the numbers are not entered properly!")
+			messagebox.showwarning("Whooops!", "Some of the numbers are not entered properly!")
 			self.master.deiconify()
 		return
 

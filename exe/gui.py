@@ -99,7 +99,7 @@ class board(object):
 		self.canvas.bind('d', lambda action: self.change_focus('<Right>',3))
 		self.canvas.bind('s', lambda action: self.change_focus('<Down>',3))
 		self.canvas.bind('w', lambda action: self.change_focus('<Up>',3))
-		# self.canvas.bind('h', self.help)
+		self.canvas.bind('h', self.usrhelp)
 		self.canvas.bind('g', lambda action: self.generate_board())
 		self.canvas.bind('<Left>', lambda action: self.change_focus('<Left>'))
 		self.canvas.bind('<Right>', lambda action: self.change_focus('<Right>'))
@@ -115,6 +115,9 @@ class board(object):
 		else:
 			self.print_all = not(self.print_all)
 		return
+
+	def usrhelp(self, event):
+		pass
 
 
 	def clear_screen(self):
@@ -180,6 +183,11 @@ class board(object):
 		return None
 	
 	def generate_board(self):
+		# message to tell the users that the randomizer would take a long time to output the numbers
+		messagebox.showinfo("Before you start", "The generate function is a heavily randomized function.\
+			\nThis action would take up to 25 seconds to generate a board.\
+			\nThe generate function would happen after you choose the difficulty of the board\
+			\nPlease note that a spinning circle is completely normal.")
 		try:
 			self.canvas.delete('current_rectangle')
 			self.canvas.unbind("q")
@@ -198,7 +206,9 @@ class board(object):
 			for i in sorted(frame.children):
 				frame.children[i].pack()
 			hard.wait_variable(var)
+			generatestarttime = time.time()
 			self.numList, self.correct= return_generated_board(var.get())
+			messagebox.showinfo("Generation finished", f"The generation function has been finished.\nThe generation used {round(time.time() - generatestarttime, 6)} seconds")
 			print(self.numList, self.correct)
 			frame.destroy()
 			print('Canvas created')
@@ -313,7 +323,7 @@ class board(object):
 				self.master.update_idletasks()
 		self.numList = self.solved_list
 		self.layer_of_text()
-		messagebox.showinfo("Information", "Your board has been solved.\n{} seconds used".format(time.time()-starttime))
+		messagebox.showinfo("Board solved", "Your board has been solved.\n{} seconds used".format(time.time()-starttime))
 		self.canvas.focus_force()
 		return
 
