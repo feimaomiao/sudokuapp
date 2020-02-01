@@ -79,16 +79,15 @@ class sudoku_board(object):
 	def __init__(self, board):
 		# Make copy instead of direct modify
 		self.sum = 0
-		self.board = copy.deepcopy(board)
+		self.board = board
 		self.tried = []
 		# Check if user inputted a valid board
 		self.finished = self.check_valid()
-		self.solve() if self.finished else None
+		# self.solve() if self.finished else None
 
 	def find_empty(self):
 		for i in range(9):
 			for j in range(9):
-				self.sum += 1
 				if self.board[i][j]==0:	
 					return(i,j)
 		return 
@@ -110,7 +109,7 @@ class sudoku_board(object):
 		return True
 
 
-	def solve(self):
+	def solve(self,generate=False):
 		# check if there are empty grids
 		find= self.find_empty()
 		if not find: 	return True
@@ -120,11 +119,12 @@ class sudoku_board(object):
 			self.sum += 1
 			# append to try. Try is used in fancy 
 			if self.valid(i,(row,col)):
-				self.tried.append(copy.deepcopy(self.board)) 
+				if not generate:
+					self.tried.append(copy.deepcopy(self.board)) 
 				# check if number is valid
 				self.board[row][col]= i
 				# recursion -- check until all empty files are checked
-				if self.solve():
+				if self.solve(generate=generate):
 					self.finished = True
 					return True
 				# location is not valid and location returns zero
@@ -163,75 +163,107 @@ class sudoku_board(object):
 					return False
 		return True
 
+def board_valid(selfboard):
+	# check if whole board is valid
+	for i in range(9):
 
-def return_generated_board(difficulty='easy',board=[]):
-	@timeout(10)
-	def generate_unsolved_board(times=20):
-		# function that generates an unsolved board to return as a game
-		board_copy = [[0 for i in range(9)] for i in range(9)]
-		possible = [i for i in range(1,10)]
-		tester= None
-		for i in range(times):
-			del(tester)
-			print('i',i)
-			# x amd u value (coordinates) of the selected grid
-			x = random.randrange(9)
-			y = random.randrange(9)
-			# check if this grid has already been used
-			if board_copy[x][y] == 0:
-				# randomly assigns number to the location
-				board_copy[x][y] = random.choice(possible)
-				tester = sudoku_board(board_copy)
-				# Check if it is a posible number
-				if not tester.check_valid():	
-					print('Its the culprit here')
-					board_copy[x][y] = 0
-				else: 							
-					continue
-				# recycles to save space and speeds up the progress
-			else:
-				print('Got lucky')
-				tester= None
-				# will continues the loop
-				continue
+		# Horizontal lines
+		for j in selfboard[i]:
+			if selfboard[i].count(j) > 1 and j != 0:
+				return False
 
-		# returns a copy with ~15 grid entered
-		return board_copy
+		# vertical lines		
+		vert = [selfboard[j][i] for j in range(9)]
+		for j in vert:
+			if vert.count(j) > 1 and j != 0:
+				return False
 
-	# initialise boards
-	generated_board = board
-	rboard = []
-	amount_of_empty_spots = 0
-	# can work as a module
-	if board==[]:	
-		try:
-			generated_board = generate_unsolved_board()
-		# Function timeouts at around 5 seconds
-		except TimeoutError as e:
+		# Groups
+		group = []
+		x0, x1 = (i%3*3, i%3*3+3)
+		y0, y1 = (i//3*3,i//3*3 +3)
+		for ys in range(y0,y1):
+			for xs in range(x0, x1):
+				group.append(selfboard[ys][xs])
+		for nums in group:
+			if group.count(nums) >1 and nums != 0:
+				return False
+	return True	
+
+
+@timeout(5)
+def return_generated_board(difficulty='insane',board=[]):
+	try:
+		@timeout(5)
+		def generate_unsolved_board(times=25):
+			# function that generates an unsolved board to return as a game
+			board_copy = [[0 for i in range(9)] for i in range(9)]
+			possible = [i for i in range(1,10)]
+			for i in range(times):
+				print('i',i)
+				# x amd u value (coordinates) of the selected grid
+				x = random.randrange(9)
+				y = random.randrange(9)
+				# check if this grid has already been used
+				if board_copy[x][y] == 0:
+					# randomly assigns number to the location
+					board_copy[x][y] = random.randrange(1,10)
+					print('182')
+					# tester = sudoku_board(board_copy)
+					# Check if it is a posible number
+					if not board_valid(board_copy):	
+						print('Its the culprit here')
+						board_copy[x][y] = 0
+						# pass
+					else: 		
+						print('ok')					
+						# pass
+					# recycles to save space and speeds up the progress
+				else:
+					print('Got lucky')
+					# will continues the loop
+					# pass
+			print('223')
+			# returns a copy with ~15 grid entered
+			return board_copy
+
+		# initialise boards
+		generated_board = board
+		rboard = []
+		amount_of_empty_spots = 0
+		# can work as a module
+		if board==[]:	
 			try:
-				generated_board = generate_unsolved_board(10)
-			# If the computer is so slow
-			except TimeoutError:
-				generated_board = generate_unsolved_board(5)
-	rboard_obj = sudoku_board(generated_board)
-	# Solves the board
-	rboard_obj.solve()
-	# Creates a copy of the board
-	rboard = copy.deepcopy(rboard_obj.board)
-	# assigns the board and empties grids
-	if difficulty == 'easy':		amount_of_empty_spots = random.randrange(25,45)
-	elif difficulty == 'medium':	amount_of_empty_spots = random.randrange(35,50)
-	elif difficulty == 'hard':		amount_of_empty_spots = random.randrange(40,60)
-	elif difficulty == 'insane':	amount_of_empty_spots = random.randrange(60, 75)
-	else:							amount_of_empty_spots = random.randrange(15,75)
-	for i in range(amount_of_empty_spots):
-		rm_x = random.randrange(9)
-		rm_y = random.randrange(9)
-		rboard[rm_x][rm_y]=0
-	return (rboard,rboard_obj.board)
-
-
-
+				generated_board = generate_unsolved_board()
+			# Function timeouts at around 5 seconds
+			except TimeoutError as e:
+				try:
+					generated_board = generate_unsolved_board()
+				# If the computer is so slow
+				except TimeoutError:
+					generated_board = generate_unsolved_board(10)
+		print('242')
+		rboard_obj = sudoku_board(generated_board)
+		print(rboard_obj.check_valid())
+		# Solves the board
+		rboard_obj.solve(generate=True)
+		print('245')
+		# Creates a copy of the board
+		rboard = rboard_obj.board
+		# assigns the board and empties grids
+		if difficulty == 'easy':		amount_of_empty_spots = random.randrange(25,45)
+		elif difficulty == 'medium':	amount_of_empty_spots = random.randrange(35,50)
+		elif difficulty == 'hard':		amount_of_empty_spots = random.randrange(40,60)
+		elif difficulty == 'insane':	amount_of_empty_spots = random.randrange(60, 75)
+		else:							amount_of_empty_spots = random.randrange(15,75)
+		for i in range(amount_of_empty_spots):
+			rboard[random.randrange(9)][random.randrange(9)]=0
+		return rboard
+	except TimeoutError as e:
+		try:
+			return return_generated_board()
+		except TimeoutError as e:
+			return return_generated_board(10)
 
 
 

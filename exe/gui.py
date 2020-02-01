@@ -160,7 +160,7 @@ class suboard(object):
 			hard.wait_variable(var)
 			generatestarttime = time.time()
 			# Get 
-			self.numList, self.correct= return_generated_board(var.get())
+			self.numList= return_generated_board(var.get())
 			messagebox.showinfo("Generation finished", f"The generation function has been finished.\nThe generation used {round(time.time() - generatestarttime, 6)} seconds")
 			frame.destroy()
 			self.canvas.pack()
