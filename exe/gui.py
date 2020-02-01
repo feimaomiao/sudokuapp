@@ -238,7 +238,7 @@ class suboard(object):
 		return rl
 
 	def solve(self, event):
-		if self.solving:    
+		if self.solving:
 			return
 		starttime = time.time()
 		self.solving = True
@@ -259,6 +259,7 @@ class suboard(object):
 			pass
 
 		self.solved_list = sudokuboard.board
+		self.solving = False
 		# output attempts
 		self.output(starttime = starttime, tries=sudokuboard.sum)
 		return

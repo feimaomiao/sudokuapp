@@ -165,7 +165,7 @@ class sudoku_board(object):
 
 
 def return_generated_board(difficulty='easy',board=[]):
-	@timeout(5)
+	@timeout(10)
 	def generate_unsolved_board(times=20):
 		# function that generates an unsolved board to return as a game
 		board_copy = [[0 for i in range(9)] for i in range(9)]
