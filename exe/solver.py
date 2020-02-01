@@ -12,12 +12,11 @@ def initialise(root, name='sudoku-solver'):
 	root.update_idletasks()
 	width = root.winfo_width()
 	height = root.winfo_height()
-	print(root.winfo_screenwidth(), root.winfo_screenheight())
 	x = (root.winfo_screenwidth() // 2) - (width // 2)
 	y = (root.winfo_screenheight() // 2) - (height // 2)
 	# Set root size and put to center
 	root.geometry('{}x{}+{}+{}'.format(width, height, x, y))
-	return (x, y)
+	return
 
 class boardDimensions(object):
 	def __init__(self):
@@ -89,12 +88,15 @@ class sudoku_board(object):
 	def find_empty(self):
 		for i in range(9):
 			for j in range(9):
-				if self.board[i][j]==0:	return(i,j)
-		return None
+				self.sum += 1
+				if self.board[i][j]==0:	
+					return(i,j)
+		return 
 
 	def valid(self,number, position):
 		# Checks if number is valid in certain position
 		for i in range(9):
+			self.sum += 1
 			# horizontal
 			if self.board[position[0]][i] == number and position[1]!= i:	return False
 			# vertical
@@ -103,6 +105,7 @@ class sudoku_board(object):
 		xpos, ypos = (position[1] //3*3, position[0]//3*3)
 		for i in range(ypos, ypos+3):
 			for j in range(xpos,xpos+3):
+				self.sum += 1
 				if self.board[i][j] == number and (i,j)!= position:			return False
 		return True
 
@@ -117,8 +120,7 @@ class sudoku_board(object):
 			self.sum += 1
 			# append to try. Try is used in fancy 
 			if self.valid(i,(row,col)):
-				if random.choice([1,2])==1:
-					self.tried.append(copy.deepcopy(self.board)) 
+				self.tried.append(copy.deepcopy(self.board)) 
 				# check if number is valid
 				self.board[row][col]= i
 				# recursion -- check until all empty files are checked

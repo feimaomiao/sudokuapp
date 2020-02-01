@@ -22,7 +22,6 @@ class suboard(object):
 		self.font = font.Font(family='Purisa', size=25, weight='bold')
 		# Initialises the root window
 		initialise(self.master)
-		print(self.master.winfo_x(), self.master.winfo_y())
 		self.solved_list = []
 		self.tries = []
 		self.selected = None
@@ -77,36 +76,39 @@ class suboard(object):
 		self.layer_of_text()
 		return
 
+	@timeout(2)
 	def change_focus(self, direction,no =1):
-		# Change rectangle with arrow or wasd keys
-		self.canvas.delete('current_rectangle')
-		csx,csy = (0,0) if not self.selected else self.selected
-		if direction == '<Left>':
-			csx -= no
-			if csx<0: csx+=9
-			if not self.selected: csx = 8
-			self.show_focus(csx, csy)
-		elif direction == '<Right>':
-			csx += no
-			if csx >8: csx -= 9
-			if not self.selected: csx = 0
-			self.show_focus(csx, csy)
-		elif direction == '<Up>':
-			csy -= no
-			if csy <0: csy += 9
-			if not self.selected: csy = 8
-			self.show_focus(csx, csy)
-		else:
-			csy += no
-			if csy >8: csy -= 9
-			if not self.selected: csy = 0
-			self.show_focus(csx, csy)
-		return
+		try:
+			# Change rectangle with arrow or wasd keys
+			self.canvas.delete('current_rectangle')
+			csx,csy = (0,0) if not self.selected else self.selected
+			if direction == '<Left>':
+				csx -= no
+				if csx<0: csx+=9
+				if not self.selected: csx = 8
+				self.show_focus(csx, csy)
+			elif direction == '<Right>':
+				csx += no
+				if csx >8: csx -= 9
+				if not self.selected: csx = 0
+				self.show_focus(csx, csy)
+			elif direction == '<Up>':
+				csy -= no
+				if csy <0: csy += 9
+				if not self.selected: csy = 8
+				self.show_focus(csx, csy)
+			else:
+				csy += no
+				if csy >8: csy -= 9
+				if not self.selected: csy = 0
+				self.show_focus(csx, csy)
+			return
+		except TimeoutError:
+			return
 
 	def mouseClick(self, event):
 		# Sense mouse click to certain location
 		self.selected = None
-		print(event.x, event.y)
 		self.canvas.delete('current_rectangle')
 		loc_y= None
 		loc_x = None
@@ -119,7 +121,6 @@ class suboard(object):
 			if event.y in range(items[0],items[1]):
 				loc_y = list(self.dimensions.y.keys())[count]
 				break
-		print(loc_x,loc_y)
 		self.master.update_idletasks()
 		self.canvas.focus_set()
 		if loc_x == None or loc_y == None:
@@ -137,7 +138,9 @@ class suboard(object):
 			\nThe generate function would happen after you choose the difficulty of the board\
 			\nPlease note that a spinning circle is completely normal.")
 		try:
+			# Deletes current rectangle or it ill be included in postscript file
 			self.canvas.delete('current_rectangle')
+			# Unbinds quit function because forcequit during waitvar would raise an error
 			self.canvas.unbind("q")
 			self.numList = []
 			# Hide the canvas including the photo
@@ -153,25 +156,26 @@ class suboard(object):
 			insane= Radiobutton(frame, text='insane', command= lambda: var.set('insane'),indicatoron = 0)
 			for i in sorted(frame.children):
 				frame.children[i].pack()
+			# Waits for user to choose one before continuing
 			hard.wait_variable(var)
 			generatestarttime = time.time()
+			# Get 
 			self.numList, self.correct= return_generated_board(var.get())
 			messagebox.showinfo("Generation finished", f"The generation function has been finished.\nThe generation used {round(time.time() - generatestarttime, 6)} seconds")
-			print(self.numList, self.correct)
 			frame.destroy()
-			print('Canvas created')
 			self.canvas.pack()
 			self.layer_of_text()
+			# Sets text in postscript
 			self.master.tk.call('set','fontmap(%s)'%font1, 'Purisa 25 bold')
 			res = self.master.tk.call('array', 'get', 'fontmap')
-			print(res)
+			# Creates postscript file and saves as eps photo
 			self.canvas.postscript(fontmap='fontMap',colormode='color',file=os.path.join(os.getcwd(), 'exe/temp/temp')+'.eps')
+			# Opens postscript eps file and opens as png
 			img=Image.open('exe/temp/temp.eps')
 			img.save('exe/temp/temp.png', 'png')
 			os.remove('exe/temp/temp.eps')
 			self.generated=True
 			self.master.overrideredirect(False)
-			print('quit')
 			self.master.update_idletasks()
 			self.master.destroy()
 			return
@@ -245,51 +249,68 @@ class suboard(object):
 		print(self.verbose)
 		print(self.print_all)
 		try:                
+			# Verbose tries
 			if self.verbose:
 				self.tried = sudokuboard.tried 
 			else:
 				self.tried=random.sample(sudokuboard.tried,random.randrange(20,100))
 		except ValueError:  
+			# Random number>length of board tries
 			pass
+
 		self.solved_list = sudokuboard.board
-		# print(sudokuboard.sum)
-		self.output(starttime = starttime)
+		# output attempts
+		self.output(starttime = starttime, tries=sudokuboard.sum)
 		return
 
-	def output(self, starttime):
+	def output(self, starttime, tries):
 		try:
+			# Catches error which occurs when the user does not ask for verbose//Catch error in which no error is thrown
 			if self.tried == None: 
 				self.print_all = False
 		except AttributeError:
 			self.print_all= False
+
+		# Print tries
 		if self.print_all:
 			for lists in self.tried:
-				self.numList = []
+				# initialise list and output
 				self.numList = lists
 				self.layer_of_text()
+				# Waits one milisecond to let user see what is happening
 				self.canvas.after(1, None)
 				self.master.update_idletasks()
+
 		self.numList = self.solved_list
+		# Show solved sudoku board
 		self.layer_of_text()
-		messagebox.showinfo("Board solved", "Your board has been solved.\n{} seconds used".format(time.time()-starttime))
+
+		# Force show full number before informing the user the statistics.
+		self.master.update_idletasks()
+		# Tells user the statistics of the solve
+		messagebox.showinfo("Board solved", f"Your board has been solved.\n\n{round(time.time()-starttime, 6)} seconds used\n\nA total of {tries} attempts are tried")
 		self.canvas.focus_force()
 		return
 
 	def show_focus(self, x ,y):
 		if self.solving:    
+			# Current rectangle should be deleted
 			self.canvas.delete('current_rectangle')
 			return
 		print(x, y)
+		# Connect to x and y dimensions
 		xvalues =self.dimensions.x.get(x)
 		yvalues= self.dimensions.y.get(y)
+		# Create rectangle object
 		self.canvas.create_rectangle(xvalues[0],yvalues[0],xvalues[1],yvalues[1],outline='red',tags='current_rectangle',width=5)
+		# Sets selected objects
 		self.selected = (x, y)
 		return  
 
 def main():
-	# print(board)
+	# Creates board object
 	sudokuB = suboard()
-
+	# Reaches this line if board object quits
 	if not sudokuB.generated:
 		# Did not quit by generate function
 		print('Thank you!')
