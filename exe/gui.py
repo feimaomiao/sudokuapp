@@ -4,65 +4,13 @@ from tkinter import filedialog
 from tkinter import font
 from PIL import Image, ImageTk, ImageGrab
 from .solver import *
+from .play_board import play_board
 import os, copy, time, random
 
 font1 = "Courier 12"
 
-class boardDimensions(object):
-	def __init__(self):
-		self.x = self.x_ranges()
-		self.y = self.y_ranges()
 
-	def __repr__(self):
-		return(self.x,self.y)
-
-	def x_ranges(self):
-		r = {
-		0: (8,54),
-		1: (54,102),
-		2: (104,149),
-		3: (157,201),
-		4: (203,250),
-		5: (252,297),
-		6: (303,346),
-		7: (351, 396),
-		8: (398, 445)
-		}
-		return r
-
-	def y_ranges(self):
-		r = {
-		0: (8,53),
-		1: (53,98),
-		2: (98,143),
-		3: (150,193),
-		4: (193,239),
-		5: (239,285),
-		6: (292,335),
-		7: (335,381),
-		8: (381,426)
-		}
-		return r
-	
-def initialise(root, name='sudoku-solver'):
-	# Set window title
-	root.title(name)
-	# Set the window size and not allow user to change the size
-	root.resizable(False, False)
-	root.minsize(453,435)
-	root.update_idletasks()
-	width = root.winfo_width()
-	height = root.winfo_height()
-	print(root.winfo_screenwidth(), root.winfo_screenheight())
-	x = (root.winfo_screenwidth() // 2) - (width // 2)
-	y = (root.winfo_screenheight() // 2) - (height // 2)
-	# Set root size and put to center
-	root.geometry('{}x{}+{}+{}'.format(width, height, x, y))
-	return (x, y)
-
-from .play_board import play_board
-
-class board(object):
+class suboard(object):
 	def __init__(self):
 		# Set user variables
 		self.solvable = False
@@ -339,10 +287,18 @@ class board(object):
 		return  
 
 def main():
-	sudokuB = board()
+	# print(board)
+	sudokuB = suboard()
+
 	if not sudokuB.generated:
+		# Did not quit by generate function
 		print('Thank you!')
+		# Quit
 		raise SystemExit
+
+	# Quits by generate -- links to generate function
 	print(sudokuB)
-	thing = play_board(sudokuB.numList)
+
+	# Creates a play board for sudoku
+	board = play_board(sudokuB.numList)
 	quit()

@@ -1,6 +1,6 @@
 import PIL, os, copy, time
 from .gui import boardDimensions, initialise
-from .solver import sudoku_board
+from .solver import *
 from tkinter import font
 from tkinter import messagebox
 from tkinter import *
