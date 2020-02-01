@@ -134,7 +134,7 @@ class suboard(object):
 	def generate_board(self):
 		# message to tell the users that the randomizer would take a long time to output the numbers
 		messagebox.showinfo("Before you start", "The generate function is a heavily randomized function.\
-			\nThis action would take up to 25 seconds to generate a board.\
+			\nThis action would take up to 10 seconds to generate a board.\
 			\nThe generate function would happen after you choose the difficulty of the board\
 			\nPlease note that a spinning circle is completely normal.")
 		try:
@@ -245,6 +245,7 @@ class suboard(object):
 		self.show_focus(0, 0)
 		transformed = self.transform(self.numList)
 		sudokuboard = sudoku_board(transformed)
+		sudokuboard.solve()
 		self.solvable = sudokuboard.finished
 		print(self.verbose)
 		print(self.print_all)

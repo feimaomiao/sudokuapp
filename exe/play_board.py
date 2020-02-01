@@ -40,7 +40,7 @@ class play_board(object):
 		for i in self.board:
 			for j in i:
 				if j == 0:
-					messagebox.showerror("You have not finished this puzzle yet!")
+					messagebox.showerror("Wait...That's illegal", "You have not finished this puzzle yet!")
 					return False
 		self.check_solve()
 
