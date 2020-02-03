@@ -41,6 +41,8 @@ class play_board(object):
 			for j in i:
 				if j == 0:
 					messagebox.showerror("Wait...That's illegal", "You have not finished this puzzle yet!")
+					self.canvas.itemconfigure('inputnums', fill='red')
+					self.canvas.focus_force()
 					return False
 		self.check_solve()
 
@@ -65,7 +67,9 @@ class play_board(object):
 		else:
 			self.master.withdraw()
 			messagebox.showwarning("Whooops!", "Some of the numbers are not entered properly!")
+			self.canvas.itemconfigure('inputnums', fill='red')
 			self.master.deiconify()
+			self.canvas.focus_force()
 		return
 
 
@@ -179,6 +183,7 @@ class play_board(object):
 		return
 
 	def input_numbers(self, event):
+		self.canvas.itemconfigure('inputnums', fill='green')
 		xcoordinate = {0: 31,1: 76,2: 127,3: 178,4: 226,5: 276,6: 325,7: 376,8: 420}
 		ycoordinate = {0: 30,1: 76,2: 122,3: 171,4: 216,5: 265,6: 312,7: 357,8: 405}
 		if not bool(self.selected) or event.char not in '1234567890':

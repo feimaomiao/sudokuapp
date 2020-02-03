@@ -64,7 +64,18 @@ class suboard(object):
 		return
 
 	def usrhelp(self, event):
-		pass
+		STRING = r''''a': Move left 3 grids
+'s': Move down 3 grids
+'d': Move right 3 grids
+'w': Move up 3 grids
+'up','down','left','right': Move to up, down, left and right 1 grid respectively
+'r': Clear Screen
+'g': Generate board to play
+'p': Set Flag 'print all'
+'v': Set Flag 'Verbose'
+'''
+		messagebox.showinfo('Help!', STRING)
+		self.canvas.focus_force()
 
 
 	def clear_screen(self):
@@ -287,7 +298,7 @@ class suboard(object):
 		# Force show full number before informing the user the statistics.
 		self.master.update_idletasks()
 		# Tells user the statistics of the solve
-		messagebox.showinfo("Board solved", f"Your board has been solved.\n\n{round(time.time()-starttime, 6)} seconds used\n\nA total of {tries} attempts are tried")
+		messagebox.showinfo("Board solved", f"Your board has been solved.\n\n{round(time.time()-starttime, 5)} seconds used\n\nA total of {tries} attempts are tried")
 		self.canvas.focus_force()
 		return
 

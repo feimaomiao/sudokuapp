@@ -156,18 +156,15 @@ class sudoku_board(object):
 def board_valid(selfboard):
 	# check if whole board is valid
 	for i in range(9):
-
 		# Horizontal lines
 		for j in selfboard[i]:
 			if selfboard[i].count(j) > 1 and j != 0:
 				return False
-
 		# vertical lines		
 		vert = [selfboard[j][i] for j in range(9)]
 		for j in vert:
 			if vert.count(j) > 1 and j != 0:
 				return False
-
 		# Groups
 		group = []
 		x0, x1 = (i%3*3, i%3*3+3)
@@ -181,58 +178,56 @@ def board_valid(selfboard):
 	return True	
 
 def return_generated_board(difficulty='insane',board=[]):
-	try:
-		@timeout(5)
-		def generate_unsolved_board(times=25):
-			# function that generates an unsolved board to return as a game
-			board_copy = [[0 for i in range(9)] for i in range(9)]
-			possible = [i for i in range(1,10)]
-			for i in range(times):
-				# x amd u value (coordinates) of the selected grid
-				x = random.randrange(9)
-				y = random.randrange(9)
-				# check if this grid has already been used
-				if board_copy[x][y] == 0:
-					# randomly assigns number to the location
-					board_copy[x][y] = random.randrange(1,10)
-					# Check if it is a posible number
-					if not board_valid(board_copy):	
-						board_copy[x][y] = 0
-			# returns a copy with ~15 grid entered
-			return board_copy
+	def generate_unsolved_board(times=25):
+		# function that generates an unsolved board to return as a game
+		board_copy = [[0 for i in range(9)] for i in range(9)]
+		possible = [i for i in range(1,10)]
+		for i in range(times):
+			# x amd u value (coordinates) of the selected grid
+			x = random.randrange(9)
+			y = random.randrange(9)
+			# check if this grid has already been used
+			if board_copy[x][y] == 0:
+				# randomly assigns number to the location
+				board_copy[x][y] = random.randrange(1,10)
+				# Check if it is a posible number
+				if not board_valid(board_copy):	
+					board_copy[x][y] = 0
+		# returns a copy with ~15 grid entered
+		return board_copy
 
-		# initialise boards
-		generated_board = board
-		rboard = []
-		amount_of_empty_spots = 0
-		# can work as a module
-		if board==[]:	
-			try:
-				generated_board = generate_unsolved_board()
-			# Function timeouts at around 5 seconds
-			except TimeoutError as e:
-				generated_board = generate_unsolved_board()
-			except KeyboardInterrupt:
-				generated_board = generate_unsolved_board()
-		rboard_obj = sudoku_board(generated_board)
-		# Solves the board
-		rboard_obj.solve(generate=True)
-		# Creates a copy of the board
-		rboard = rboard_obj.board
-		# assigns the board and empties grids
-		if difficulty == 'easy':		
-			amount_of_empty_spots = random.randrange(25,45)
-		elif difficulty == 'medium':	
-			amount_of_empty_spots = random.randrange(35,50)
-		elif difficulty == 'hard':		
-			amount_of_empty_spots = random.randrange(40,60)
-		elif difficulty == 'insane':	
-			amount_of_empty_spots = random.randrange(60, 75)
-		else:							
-			amount_of_empty_spots = random.randrange(15,75)
-		for i in range(amount_of_empty_spots):
-			rboard[random.randrange(9)][random.randrange(9)]=0
-		return rboard
+	# initialise boards
+	generated_board = board
+	rboard = []
+	amount_of_empty_spots = 0
+	# can work as a module
+	if board==[]:	
+		try:
+			generated_board = generate_unsolved_board()
+		# Function timeouts at around 5 seconds
+		except TimeoutError as e:
+			generated_board = generate_unsolved_board()
+		except KeyboardInterrupt:
+			generated_board = generate_unsolved_board()
+	rboard_obj = sudoku_board(generated_board)
+	# Solves the board
+	rboard_obj.solve(generate=True)
+	# Creates a copy of the board
+	rboard = rboard_obj.board
+	# assigns the board and empties grids
+	if difficulty == 'easy':		
+		amount_of_empty_spots = random.randrange(25,45)
+	elif difficulty == 'medium':	
+		amount_of_empty_spots = random.randrange(35,50)
+	elif difficulty == 'hard':		
+		amount_of_empty_spots = random.randrange(40,60)
+	elif difficulty == 'insane':	
+		amount_of_empty_spots = random.randrange(60, 75)
+	else:							
+		amount_of_empty_spots = random.randrange(15,75)
+	for i in range(amount_of_empty_spots):
+		rboard[random.randrange(9)][random.randrange(9)]=0
+	return rboard
 
 def test_if_valid(num=100):
 	# Tests if the generated board is avaliable
@@ -245,7 +240,6 @@ def test_if_valid(num=100):
 		obj = sudoku_board(board)
 		if not obj.check_valid():
 			print('Wrong')
-			raise TypeError
 			break
 		print('Yes')
 		total.append(time.time()-start)
