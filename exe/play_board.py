@@ -151,9 +151,11 @@ class play_board(object):
 		return
 
 	def forcequit(self, event):
+		# removes created file
 		os.remove('exe/temp/temp.png')
 		self.master.overrideredirect(False)
 		print('quit')
+		# Clears any unfinished jobs
 		self.master.update_idletasks()
 		self.master.destroy()
 		quit()

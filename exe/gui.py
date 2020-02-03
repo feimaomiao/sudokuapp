@@ -136,6 +136,7 @@ class suboard(object):
 		messagebox.showinfo("Before you start", "The generate function is a heavily randomized function.\
 			\nThis action would take up to 10 seconds to generate a board.\
 			\nThe generate function would happen after you choose the difficulty of the board\
+			\nDuring the selection progress you would not be able to quit the function, other functions may be limited\
 			\nPlease note that a spinning circle is completely normal.")
 		try:
 			# Deletes current rectangle or it ill be included in postscript file
@@ -149,6 +150,7 @@ class suboard(object):
 			# Create a new frame to ask for the user input.
 			frame = Frame(self.master, bg='black')
 			frame.pack(fill=BOTH, expand = 1)
+			self.master.overrideredirect(True)
 			# Add four radiobuttons and set different commannds
 			easy = Radiobutton(frame, text='easy', command= lambda: var.set('easy'),indicatoron = 0)
 			medium = Radiobutton(frame, text='medium', command= lambda: var.set('medium'),indicatoron = 0)
@@ -179,13 +181,8 @@ class suboard(object):
 			self.master.update_idletasks()
 			self.master.destroy()
 			return
-		except SystemExit:
-			print('it doesnt work')
-			hard.set('hard')
-		except TimeoutError:
-			hard.set('hard')
-			print('go')
-			quit()
+		except Exception as e:
+			self.forcequit()
 
 	def forcequit(self, event):
 		self.master.overrideredirect(False)
