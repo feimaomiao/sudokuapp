@@ -119,7 +119,7 @@ class sudoku_board(object):
 
 			for i in range(1,10):
 				self.sum += 1
-				if self.sum >= 100000:
+				if self.sum >= 50000:
 					return True
 				# append to try. Try is used in fancy 
 				if self.valid(i,(row,col)):
@@ -262,14 +262,17 @@ def return_generated_board(difficulty='insane',board=[]):
 
 
 def test_if_valid():
+	# Tests if the generated board is avaliable
 	import time
-	start= time.time()
 	total = []
 	for i in range(100):
+		start= time.time()
 		board = return_generated_board()
 		obj = sudoku_board(board)
 		if not obj.check_valid():
+			print('Wrong')
 			break
+		print('Yes')
 		total.append(time.time()-start)
 	return total
 
