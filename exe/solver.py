@@ -278,6 +278,8 @@ def return_generated_board(difficulty='insane',board=[]):
 
 def test_if_valid():
 	import time
+	start= time.time()
+	total = []
 	for i in range(100):
 		board = return_generated_board()
 		obj = sudoku_board(board)
@@ -285,6 +287,8 @@ def test_if_valid():
 			print('It is not worth it')
 			break
 		print('Success')
+		total.append(time.time()-start)
+	return total
 
 
 
