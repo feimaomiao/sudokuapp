@@ -1,7 +1,6 @@
-import copy, random, os
+import copy, random, os, errno, signal
 from functools import wraps
-import errno
-import signal
+
 def initialise(root, name='sudoku-solver'):
 	# Set window title
 	root.title(name)
@@ -190,8 +189,6 @@ def board_valid(selfboard):
 				return False
 	return True	
 
-
-@timeout(5)
 def return_generated_board(difficulty='insane',board=[]):
 	try:
 		@timeout(5)
@@ -210,13 +207,6 @@ def return_generated_board(difficulty='insane',board=[]):
 					# Check if it is a posible number
 					if not board_valid(board_copy):	
 						board_copy[x][y] = 0
-						pass
-					else: 						
-						pass
-					# recycles to save space and speeds up the progress
-				else:
-					# will continues the loop
-					pass
 			# returns a copy with ~15 grid entered
 			return board_copy
 
@@ -252,29 +242,23 @@ def return_generated_board(difficulty='insane',board=[]):
 		for i in range(amount_of_empty_spots):
 			rboard[random.randrange(9)][random.randrange(9)]=0
 		return rboard
-	except TimeoutError as e:
-		try:
-			return return_generated_board()
-		except TimeoutError as e:
-			return return_generated_board(10)
-	except KeyboardInterrupt:
-		return return_generated_board()
 
-
-def test_if_valid():
+def test_if_valid(num=100):
 	# Tests if the generated board is avaliable
 	import time
+	from statistics import mean
 	total = []
-	for i in range(100):
+	for i in range(num):
 		start= time.time()
 		board = return_generated_board()
 		obj = sudoku_board(board)
 		if not obj.check_valid():
 			print('Wrong')
+			raise TypeError
 			break
 		print('Yes')
 		total.append(time.time()-start)
-	return total
+	return mean(total)
 
 
 
