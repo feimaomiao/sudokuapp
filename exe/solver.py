@@ -18,14 +18,7 @@ def initialise(root, name='sudoku-solver'):
 
 class boardDimensions(object):
 	def __init__(self):
-		self.x = self.x_ranges()
-		self.y = self.y_ranges()
-
-	def __repr__(self):
-		return(self.x,self.y)
-
-	def x_ranges(self):
-		r = {
+		self.x = {
 		0: (8,54),
 		1: (54,102),
 		2: (104,149),
@@ -36,10 +29,7 @@ class boardDimensions(object):
 		7: (351, 396),
 		8: (398, 445)
 		}
-		return r
-
-	def y_ranges(self):
-		r = {
+		self.y = {
 		0: (8,53),
 		1: (53,98),
 		2: (98,143),
@@ -50,7 +40,9 @@ class boardDimensions(object):
 		7: (335,381),
 		8: (381,426)
 		}
-		return r
+
+	def __repr__(self):
+		return(self.x,self.y)
 
 class TimeoutError(Exception):
     pass
@@ -81,7 +73,6 @@ class sudoku_board(object):
 		self.tried = []
 		# Check if user inputted a valid board
 		self.finished = self.check_valid()
-		# self.solve() if self.finished else None
 
 	def find_empty(self):
 		for i in range(9):
