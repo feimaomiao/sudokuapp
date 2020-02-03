@@ -133,7 +133,6 @@ class sudoku_board(object):
 					# location is not valid and location returns zero
 					self.board[row][col] = 0
 		except (KeyboardInterrupt, TimeoutError):
-			print('solver caught it')
 			return True
 		return False
 
@@ -201,7 +200,6 @@ def return_generated_board(difficulty='insane',board=[]):
 			board_copy = [[0 for i in range(9)] for i in range(9)]
 			possible = [i for i in range(1,10)]
 			for i in range(times):
-				print('i',i)
 				# x amd u value (coordinates) of the selected grid
 				x = random.randrange(9)
 				y = random.randrange(9)
@@ -209,22 +207,16 @@ def return_generated_board(difficulty='insane',board=[]):
 				if board_copy[x][y] == 0:
 					# randomly assigns number to the location
 					board_copy[x][y] = random.randrange(1,10)
-					print('182')
-					# tester = sudoku_board(board_copy)
 					# Check if it is a posible number
 					if not board_valid(board_copy):	
-						print('Its the culprit here')
 						board_copy[x][y] = 0
-						# pass
-					else: 		
-						print('ok')					
-						# pass
+						pass
+					else: 						
+						pass
 					# recycles to save space and speeds up the progress
 				else:
-					print('Got lucky')
 					# will continues the loop
-					# pass
-			print('223')
+					pass
 			# returns a copy with ~15 grid entered
 			return board_copy
 
@@ -240,18 +232,13 @@ def return_generated_board(difficulty='insane',board=[]):
 			except TimeoutError as e:
 				generated_board = generate_unsolved_board()
 			except KeyboardInterrupt:
-				print('248 caught it')
 				generated_board = generate_unsolved_board()
-		print('242')
 		rboard_obj = sudoku_board(generated_board)
-		print(rboard_obj.check_valid())
 		# Solves the board
 		rboard_obj.solve(generate=True)
-		print('245')
 		# Creates a copy of the board
 		rboard = rboard_obj.board
 		# assigns the board and empties grids
-		print(rboard_obj.sum)
 		if difficulty == 'easy':		
 			amount_of_empty_spots = random.randrange(25,45)
 		elif difficulty == 'medium':	
@@ -262,7 +249,6 @@ def return_generated_board(difficulty='insane',board=[]):
 			amount_of_empty_spots = random.randrange(60, 75)
 		else:							
 			amount_of_empty_spots = random.randrange(15,75)
-		print('difficulty:',difficulty)
 		for i in range(amount_of_empty_spots):
 			rboard[random.randrange(9)][random.randrange(9)]=0
 		return rboard
@@ -272,7 +258,6 @@ def return_generated_board(difficulty='insane',board=[]):
 		except TimeoutError as e:
 			return return_generated_board(10)
 	except KeyboardInterrupt:
-		print('KeyboardInterrupt')
 		return return_generated_board()
 
 
@@ -284,9 +269,7 @@ def test_if_valid():
 		board = return_generated_board()
 		obj = sudoku_board(board)
 		if not obj.check_valid():
-			print('It is not worth it')
 			break
-		print('Success')
 		total.append(time.time()-start)
 	return total
 
