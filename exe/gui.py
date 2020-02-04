@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter import filedialog
 from tkinter import font
+import PIL
 from PIL import Image, ImageTk, ImageGrab
 from .solver import *
 from .play_board import play_board
@@ -28,11 +29,14 @@ class suboard(object):
 		# Add in default numlist
 		self.numList = [[' ' for c in range(9)] for i in range(9)]
 		self.canvas = Canvas(self.master,width=453,height=435)
-		self.image= ImageTk.PhotoImage(Image.open(os.path.join(os.getcwd(),'exe','sudoku.png')))
+		print(os.getcwd())
+		self.image_copy= PIL.ImageTk.PhotoImage(Image.open(os.path.join(os.getcwd(),'exe','sudoku.png')))
+		# d = Image.open(os.path.join('exe','sudoku.png'))
+		# d.show()
 		# Put image into canvas
-		self.canvas.create_image(0,0,anchor=NW,image=self.image)
+		self.canvas.create_image((0,0),anchor=NW,image=self.image_copy)
 		self.copy_of_board = []
-		self.canvas.pack()
+		self.canvas.pack(side=TOP,expand=YES)
 		self.dimensions = boardDimensions()
 		# Put focus to canvas and set binding
 		self.canvas.focus_set()

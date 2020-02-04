@@ -2,4 +2,6 @@ exe/__pycache__
 __pycache__
 .DS_Store
 exe/temp
+build
+dist
 exe/todo
