@@ -2,12 +2,12 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter import filedialog
 from tkinter import font
-import PIL
-from PIL import Image, ImageTk, ImageGrab
+from PIL import Image, ImageTk#, ImageGrab
 from .solver import *
 from .play_board import play_board
-import os, copy, time, random
+import os, copy, time, random, PIL
 
+global font1
 font1 = "Courier 12"
 
 
@@ -67,18 +67,15 @@ class suboard(object):
 			self.print_all = not(self.print_all)
 		return
 
-	def usrhelp(self, event):
-		STRING = r''''a': Move left 3 grids
-'s': Move down 3 grids
-'d': Move right 3 grids
-'w': Move up 3 grids
-'up','down','left','right': Move to up, down, left and right 1 grid respectively
-'r': Clear Screen
+	def usrhelp(self, event=None):
+		STRING = r''''r': Clear Screen
 'g': Generate board to play
 'p': Set Flag 'print all'
 'v': Set Flag 'Verbose'
+'up','left','down','right': Move to up, left, down and right 1 grid respectively
+'w','a','s','d': Move to up, left, down and right 3 grids respectively
 '''
-		messagebox.showinfo('Help!', STRING)
+		messagebox.showinfo('Seems like you need some help', STRING)
 		self.canvas.focus_force()
 
 
@@ -220,7 +217,7 @@ class suboard(object):
 	def input_numbers(self, event):
 		try:
 			# lets user input number
-			if not self.selected or event.char not in '0123456789' or self.solving: pass
+			if not self.selected or event.char not in '0123456789' or self.solving: self.usrhelp()
 			else: 
 				inputed = event.char
 				if inputed == '0':      
@@ -254,10 +251,11 @@ class suboard(object):
 			return
 		starttime = time.time()
 		self.solving = True
+		# Clears the board, empties the board.
 		self.show_focus(0, 0)
 		transformed = self.transform(self.numList)
 		sudokuboard = sudoku_board(transformed)
-		sudokuboard.solve()
+		sudokuboard.solve(generate=self.print_all)
 		self.solvable = sudokuboard.finished
 		print(self.verbose)
 		print(self.print_all)
@@ -271,11 +269,11 @@ class suboard(object):
 			# Random number>length of board tries
 			pass
 
+		# Returns solved list
 		self.solved_list = sudokuboard.board
 		self.solving = False
 		# output attempts
-		self.output(starttime = starttime, tries=sudokuboard.sum)
-		return
+		return self.output(starttime = starttime, tries=sudokuboard.sum)
 
 	def output(self, starttime, tries):
 		try:
@@ -304,6 +302,7 @@ class suboard(object):
 		# Tells user the statistics of the solve
 		messagebox.showinfo("Board solved", f"Your board has been solved.\n\n{round(time.time()-starttime, 5)} seconds used\n\nA total of {tries} attempts are tried")
 		self.canvas.focus_force()
+		self.layer_of_text()
 		return
 
 	def show_focus(self, x ,y):

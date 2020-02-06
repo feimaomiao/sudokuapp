@@ -24,6 +24,7 @@ class play_board(object):
 		self.canvas.focus_set()
 		self.canvas.bind('q', self.forcequit)
 		self.canvas.bind('r', self.empty_screen)
+		self.canvas.bind('h', self.usrhelp)
 		self.canvas.bind('<Up>', self.move_vertical)
 		self.canvas.bind('<Down>', self.move_vertical)
 		self.canvas.bind('<Left>', self.move_horizontal)
@@ -187,7 +188,7 @@ class play_board(object):
 		xcoordinate = {0: 31,1: 76,2: 127,3: 178,4: 226,5: 276,6: 325,7: 376,8: 420}
 		ycoordinate = {0: 30,1: 76,2: 122,3: 171,4: 216,5: 265,6: 312,7: 357,8: 405}
 		if not bool(self.selected) or event.char not in '1234567890':
-			print(event.char)
+			self.usrhelp()
 			return
 		x, y = self.selected
 		self.board[y][x] = event.char
@@ -201,6 +202,13 @@ class play_board(object):
 		self.canvas.delete(str(tag))
 		self.canvas.create_text(xcoordinate.get(x), ycoordinate.get(y), text=text, fill='green', font=self.font, anchor=CENTER, tags=(str(tag), 'inputnums'))
 		return
+
+	def usrhelp(self, event= None):
+		STRING = r''''up','down','left','right': Moves the chosen grid up, down, left or right to the closest avaliable grid
+'r': Restart the board and clear all settings
+'q': Quits program
+'h': User help
+		'''
 
 
 
