@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter import filedialog
 from tkinter import font
-from PIL import Image, ImageTk#, ImageGrab
+from PIL import Image, ImageTk
 from .solver import *
 from .play_board import play_board
 import os, copy, time, random, PIL
@@ -13,6 +13,7 @@ font1 = "Courier 12"
 
 class suboard(object):
 	def __init__(self):
+		print(os.path.isfile('exe/sudoku.png'))
 		# Set user variables
 		self.solvable = False
 		self.solving = False
@@ -30,16 +31,17 @@ class suboard(object):
 		self.numList = [[' ' for c in range(9)] for i in range(9)]
 		self.canvas = Canvas(self.master,width=453,height=435)
 		print(os.getcwd())
-		self.image_copy= PIL.ImageTk.PhotoImage(Image.open(os.path.join(os.getcwd(),'exe','sudoku.png')))
-		# d = Image.open(os.path.join('exe','sudoku.png'))
-		# d.show()
-		# Put image into canvas
-		self.canvas.create_image((0,0),anchor=NW,image=self.image_copy)
 		self.copy_of_board = []
 		self.canvas.pack(side=TOP,expand=YES)
 		self.dimensions = boardDimensions()
 		# Put focus to canvas and set binding
 		self.canvas.focus_set()
+		self.file = Image.open('exe/sudoku.png')
+		self.image= ImageTk.PhotoImage(self.file)
+		# d = Image.open(os.path.join('sudoku.png'))
+		# d.show()
+		# Put image into canvas
+		self.canvas.create_image((0,0),anchor=NW,image=self.image)
 		self.canvas.bind('<Button-1>',self.mouseClick)
 		self.canvas.bind('<Return>',self.solve)
 		self.quitbind = self.canvas.bind('q',self.forcequit)
@@ -169,6 +171,7 @@ class suboard(object):
 			hard= Radiobutton(frame, text='hard', command=lambda: var.set('hard'),indicatoron = 0)
 			insane= Radiobutton(frame, text='insane', command= lambda: var.set('insane'),indicatoron = 0)
 			for i in sorted(frame.children):
+				# Packs the four radiobuttons
 				frame.children[i].pack()
 			# Waits for user to choose one before continuing
 			hard.wait_variable(var)
@@ -179,6 +182,7 @@ class suboard(object):
 			frame.destroy()
 			self.canvas.pack()
 			self.layer_of_text()
+
 			# Sets text in postscript
 			self.master.tk.call('set','fontmap(%s)'%font1, 'Purisa 25 bold')
 			res = self.master.tk.call('array', 'get', 'fontmap')
@@ -247,6 +251,7 @@ class suboard(object):
 		return rl
 
 	def solve(self, event):
+		self.master.update_idletasks()
 		if self.solving:
 			return
 		starttime = time.time()
@@ -255,10 +260,9 @@ class suboard(object):
 		self.show_focus(0, 0)
 		transformed = self.transform(self.numList)
 		sudokuboard = sudoku_board(transformed)
-		sudokuboard.solve(generate=self.print_all)
+		# print('printall',self.print_all, '\nverbose',self.verbose)
+		sudokuboard.solve(generate=not self.print_all)
 		self.solvable = sudokuboard.finished
-		print(self.verbose)
-		print(self.print_all)
 		try:                
 			# Verbose tries
 			if self.verbose:
@@ -296,26 +300,25 @@ class suboard(object):
 		self.numList = self.solved_list
 		# Show solved sudoku board
 		self.layer_of_text()
-
 		# Force show full number before informing the user the statistics.
 		self.master.update_idletasks()
 		# Tells user the statistics of the solve
 		messagebox.showinfo("Board solved", f"Your board has been solved.\n\n{round(time.time()-starttime, 5)} seconds used\n\nA total of {tries} attempts are tried")
 		self.canvas.focus_force()
 		self.layer_of_text()
-		return
 
 	def show_focus(self, x ,y):
 		if self.solving:    
 			# Current rectangle should be deleted
 			self.canvas.delete('current_rectangle')
 			return
-		print(x, y)
 		# Connect to x and y dimensions
 		xvalues =self.dimensions.x.get(x)
 		yvalues= self.dimensions.y.get(y)
+
 		# Create rectangle object
 		self.canvas.create_rectangle(xvalues[0],yvalues[0],xvalues[1],yvalues[1],outline='red',tags='current_rectangle',width=5)
+
 		# Sets selected objects
 		self.selected = (x, y)
 		return  

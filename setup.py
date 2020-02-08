@@ -7,7 +7,7 @@ Usage:
 from setuptools import setup
 
 APP = ['__main__.py']
-DATA_FILES = ['exe']
+DATA_FILES = ['exe', 'exe/sudoku.png']
 OPTIONS = {'argv_emulation': False, 'includes':['tkinter', 'os','copy','time','random','errno','signal','functools'],'packages': ['PIL', 'gui','play_board','solver']}
 
 setup(
