@@ -6,14 +6,13 @@ Usage:
 """
 from setuptools import setup
 
-APP = ['__main__.py']
+APP = ['sudoku.py']
 DATA_FILES = ['exe', 'exe/sudoku.png']
-OPTIONS = {'argv_emulation': False, 'includes':['tkinter', 'os','copy','time','random','errno','signal','functools'],'packages': ['PIL', 'gui','play_board','solver']}
+OPTIONS = {'argv_emulation': False, 'includes':['tkinter', 'os','copy','time','random','errno','signal','functools'],'packages': ['PIL', 'exe']}
 
 setup(
     app=APP,
     data_files=DATA_FILES,
-    package_dir={'':'exe'},
     options={'py2app': OPTIONS},
     setup_requires=['py2app'],
 )

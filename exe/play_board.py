@@ -19,7 +19,7 @@ class play_board(object):
 		initialise(self.master, name='sudoku-play')
 		self.canvas = Canvas(self.master, name='sudoku-game')
 		self.canvas = Canvas(self.master,width=453,height=435)
-		self.image= PIL.ImageTk.PhotoImage(PIL.Image.open(os.path.join(os.getcwd(),'exe','temp','temp.png')))
+		self.image= PIL.ImageTk.PhotoImage(PIL.Image.open(os.path.join('exe','temp','temp.png')))
 		self.canvas.create_image(0,0,anchor=NW,image=self.image)
 		self.canvas.focus_set()
 		self.canvas.bind('q', self.forcequit)
@@ -64,7 +64,7 @@ class play_board(object):
 		if solved:
 			self.master.withdraw()
 			messagebox.showinfo("Success!", "Congratulations! You successfully solved the board\nYou solved this box in {} seconds".format(round(time.time()-self.starttime)))
-			quit()
+			self.master.destroy()
 		else:
 			self.master.withdraw()
 			messagebox.showwarning("Whooops!", "Some of the numbers are not entered properly!")
@@ -163,7 +163,6 @@ class play_board(object):
 		# Clears any unfinished jobs
 		self.master.update_idletasks()
 		self.master.destroy()
-		quit()
 		
 	def empty_screen(self, event):
 		self.board = copy.deepcopy(self.board_unsolved)

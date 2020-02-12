@@ -1,19 +1,18 @@
 from tkinter import *
-from tkinter import messagebox
-from tkinter import filedialog
-from tkinter import font
+from tkinter import messagebox, filedialog, font
 from PIL import Image, ImageTk
 from .solver import *
 from .play_board import play_board
-import os, copy, time, random, PIL
+import os, copy, time, random, PIL, sys
+from stat import S_IRWXG
 
+os.environ["PATH"] += ":/usr/local/bin:/usr/local/bin/gs"
 global font1
 font1 = "Courier 12"
 
 
 class suboard(object):
 	def __init__(self):
-		print(os.path.isfile('exe/sudoku.png'))
 		# Set user variables
 		self.solvable = False
 		self.solving = False
@@ -30,17 +29,12 @@ class suboard(object):
 		# Add in default numlist
 		self.numList = [[' ' for c in range(9)] for i in range(9)]
 		self.canvas = Canvas(self.master,width=453,height=435)
-		print(os.getcwd())
 		self.copy_of_board = []
-		self.canvas.pack(side=TOP,expand=YES)
+		self.canvas.pack()
 		self.dimensions = boardDimensions()
-		# Put focus to canvas and set binding
 		self.canvas.focus_set()
 		self.file = Image.open('exe/sudoku.png')
 		self.image= ImageTk.PhotoImage(self.file)
-		# d = Image.open(os.path.join('sudoku.png'))
-		# d.show()
-		# Put image into canvas
 		self.canvas.create_image((0,0),anchor=NW,image=self.image)
 		self.canvas.bind('<Button-1>',self.mouseClick)
 		self.canvas.bind('<Return>',self.solve)
@@ -149,9 +143,7 @@ class suboard(object):
 		# message to tell the users that the randomizer would take a long time to output the numbers
 		messagebox.showinfo("Before you start", "The generate function is a heavily randomized function.\
 			\nThis action would take up to 10 seconds to generate a board.\
-			\nThe generate function would happen after you choose the difficulty of the board\
-			\nDuring the selection progress you would not be able to quit the function, other functions may be limited\
-			\nPlease note that a spinning circle is completely normal.")
+			\nThe random function will start after you choose the difficulty")
 		try:
 			# Deletes current rectangle or it ill be included in postscript file
 			self.canvas.delete('current_rectangle')
@@ -185,12 +177,23 @@ class suboard(object):
 
 			# Sets text in postscript
 			self.master.tk.call('set','fontmap(%s)'%font1, 'Purisa 25 bold')
-			res = self.master.tk.call('array', 'get', 'fontmap')
 			# Creates postscript file and saves as eps photo
-			self.canvas.postscript(fontmap='fontMap',colormode='color',file=os.path.join(os.getcwd(), 'exe/temp/temp')+'.eps')
+			self.canvas.postscript(fontmap='fontMap',colormode='color',file='exe/temp/temp'+'.eps')
 			# Opens postscript eps file and opens as png
-			img=Image.open('exe/temp/temp.eps')
-			img.save('exe/temp/temp.png', 'png')
+			messagebox.showinfo('test',os.path.dirname(os.path.abspath('exe/temp/temp.eps')))
+			img = Image.open(os.path.abspath('exe/temp/temp.eps'))
+			messagebox.showinfo('test', 'line 193')
+			os.chmod('exe/temp',0o777)
+			os.chmod('exe/temp/temp.eps', 0o777)
+			messagebox.showinfo('test','line 195,{}'.format(os.path.dirname(os.path.abspath('exe'))))
+			messagebox.showinfo('test2','{}'.format(os.access(os.path.join(os.path.dirname(os.path.abspath('exe')), 'exe','temp'), os.W_OK)))
+			with open(os.path.join(os.path.dirname(os.path.abspath('exe')), 'exe','temp','temp.png'), 'wb') as png_file:
+				messagebox.showinfo('inf','201')
+				try:
+					img.save(png_file)
+				except Exception as e:
+					messagebox.showinfo('error', '{}'.format(e))
+			messagebox.showinfo('success','line 204')
 			os.remove('exe/temp/temp.eps')
 			self.generated=True
 			self.master.overrideredirect(False)
@@ -331,11 +334,11 @@ def main():
 		# Did not quit by generate function
 		print('Thank you!')
 		# Quit
-		raise SystemExit
+		return
 
 	# Quits by generate -- links to generate function
 	print(sudokuB)
 
 	# Creates a play board for sudoku
 	board = play_board(sudokuB.numList)
-	quit()
+	return
