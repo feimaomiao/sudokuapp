@@ -177,11 +177,11 @@ def board_valid(selfboard):
 				return False
 	return True	
 
-def return_generated_board(difficulty='insane',board=[]):
+def return_generated_board(difficulty='none',board=[]):
 	def generate_unsolved_board(times=25):
 		# function that generates an unsolved board to return as a game
-		board_copy = [[0 for i in range(9)] for i in range(9)]
-		possible = [i for i in range(1,10)]
+		board_copy = [[0,0,0,0,0,0,0,0,0] for i in range(9)]
+		possible = [1,2,3,4,5,6,7,8,9]
 		for i in range(times):
 			# x amd u value (coordinates) of the selected grid
 			x = random.randrange(9)
@@ -239,9 +239,7 @@ def test_if_valid(num=100):
 		board = return_generated_board()
 		obj = sudoku_board(board)
 		if not obj.check_valid():
-			print('Wrong')
 			break
-		print('Yes')
 		total.append(time.time()-start)
 	return mean(total)
 

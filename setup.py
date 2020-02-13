@@ -8,7 +8,12 @@ from setuptools import setup
 
 APP = ['sudoku.py']
 DATA_FILES = ['exe', 'exe/sudoku.png']
-OPTIONS = {'argv_emulation': False, 'includes':['tkinter', 'os','copy','time','random','errno','signal','functools'],'packages': ['PIL', 'exe']}
+OPTIONS = {
+	'argv_emulation': True,
+	'includes':['tkinter', 'os','copy','time','random','errno','signal','functools'],
+	'packages': ['exe','PIL'],
+	# 'excludes': ['PyQt5']
+}
 
 setup(
     app=APP,

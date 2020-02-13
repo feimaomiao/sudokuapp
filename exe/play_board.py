@@ -9,9 +9,7 @@ class play_board(object):
 		self.starttime = time.time()
 		self.selected = None
 		self.dimensions = boardDimensions()
-		# Do not cahnge. used to check which grid is empty.
-		# board = [[1,1,1,1,1,1,1,1,0]]+ [[0,0,0,0,0,0,0,0,1] for i in range(8)]
-		# print(board)
+		# Do not change. used to check which grid is empty.
 		self.board_unsolved = copy.deepcopy(board)
 		# Board that user used to enter numbers[]
 		self.board = copy.deepcopy(board)
@@ -21,7 +19,8 @@ class play_board(object):
 		self.canvas = Canvas(self.master,width=453,height=435)
 		self.image= PIL.ImageTk.PhotoImage(PIL.Image.open(os.path.join('exe','temp','temp.png')))
 		self.canvas.create_image(0,0,anchor=NW,image=self.image)
-		self.canvas.focus_set()
+		self.canvas.focus_force()
+		# bindings
 		self.canvas.bind('q', self.forcequit)
 		self.canvas.bind('r', self.empty_screen)
 		self.canvas.bind('h', self.usrhelp)
@@ -32,12 +31,12 @@ class play_board(object):
 		self.canvas.bind('<Button-1>', self.mouseClick)
 		self.canvas.bind('<Return>', self.check)
 		self.canvas.bind('<Key>', self.input_numbers)
+		# Set output font
 		self.font = font.Font(family='Purisa', size=25, weight='bold')
 		self.canvas.pack()
 		self.master.mainloop()
 
 	def check(self, event):
-		print(self.board)
 		for i in self.board:
 			for j in i:
 				if j == 0:
@@ -63,7 +62,8 @@ class play_board(object):
 		print(solved)
 		if solved:
 			self.master.withdraw()
-			messagebox.showinfo("Success!", "Congratulations! You successfully solved the board\nYou solved this box in {} seconds".format(round(time.time()-self.starttime)))
+			messagebox.showinfo("Success!", "Congratulations! You successfully solved the board\
+				\nYou solved this box in {} seconds".format(round(time.time()-self.starttime)))
 			self.master.destroy()
 		else:
 			self.master.withdraw()
