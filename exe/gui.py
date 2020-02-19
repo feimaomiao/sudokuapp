@@ -6,7 +6,7 @@ from .play_board import play_board
 import os, copy, time, random, PIL, sys
 from stat import S_IRWXG
 
-os.environ["PATH"] += ":/usr/local/bin:/usr/local/bin/gs"
+# os.environ["PATH"] += ":/usr/local/bin:/usr/local/bin/gs"
 global font1
 font1 = "Courier 12"
 
@@ -185,14 +185,12 @@ class suboard(object):
 			messagebox.showinfo('test', 'line 193')
 			os.chmod('exe/temp',0o777)
 			os.chmod('exe/temp/temp.eps', 0o777)
-			messagebox.showinfo('test','line 195,{}'.format(os.path.dirname(os.path.abspath('exe'))))
-			messagebox.showinfo('test2','{}'.format(os.access(os.path.join(os.path.dirname(os.path.abspath('exe')), 'exe','temp'), os.W_OK)))
-			with open(os.path.join(os.path.dirname(os.path.abspath('exe')), 'exe','temp','temp.png'), 'wb') as png_file:
-				messagebox.showinfo('inf','201')
-				try:
-					img.save(png_file)
-				except Exception as e:
-					messagebox.showinfo('error', '{}'.format(e))
+			messagebox.showinfo('test','line 188,{}'.format(os.path.dirname(os.path.abspath('exe'))))
+			messagebox.showinfo('test2','line 189{}'.format(os.access(os.path.join(os.path.dirname(os.path.abspath('exe')), 'exe','temp'), os.W_OK)))
+			# with open(os.path.join(os.path.dirname(os.path.abspath('exe')), 'exe','temp','temp.png'), 'wb') as png_file:
+			# 	messagebox.showinfo('inf','201')
+			# 	img.save(png_file)
+			img.save(os.path.join('exe','temp','temp.png'), 'png')
 			messagebox.showinfo('success','line 204')
 			os.remove('exe/temp/temp.eps')
 			self.generated=True
@@ -201,7 +199,7 @@ class suboard(object):
 			self.master.destroy()
 			return
 		except Exception as e:
-			self.forcequit()
+			messagebox.showinfo('error', '{}'.format(e))
 
 	def forcequit(self, event):
 		self.master.overrideredirect(False)

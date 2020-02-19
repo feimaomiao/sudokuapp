@@ -120,7 +120,6 @@ class play_board(object):
 					if self.board_unsolved[i][j] == 0:
 						pos.append(i)
 				if len(pos)>= 1:
-					print(pos)
 					break
 			print(ord(event.char))
 			if not keys.get(ord(event.char)):
@@ -129,9 +128,7 @@ class play_board(object):
 				k = 0
 			self.show_focus(j, pos[k])
 		else:
-			print(self.selected)
 			pos = [i for i in range(9) if self.board_unsolved[i][self.selected[0]] == 0]
-			print(pos)
 			self.show_focus(self.selected[0], self.move_one(pos, self.selected[1], keys.get(ord(event.char))))
 		return
 
@@ -147,9 +144,7 @@ class play_board(object):
 			if event.y in range(items[0],items[1]):
 				loc_y = list(self.dimensions.y.keys())[count]
 				break
-		print(loc_x,loc_y)
 		if loc_x == None or loc_y == None:
-			print('This is erroor')
 			self.selected = None
 			return
 		self.show_focus(loc_x, loc_y)
@@ -159,15 +154,14 @@ class play_board(object):
 		# removes created file
 		os.remove('exe/temp/temp.png')
 		self.master.overrideredirect(False)
-		print('quit')
 		# Clears any unfinished jobs
 		self.master.update_idletasks()
+		# automatically quits program
 		self.master.destroy()
 		
 	def empty_screen(self, event):
 		self.board = copy.deepcopy(self.board_unsolved)
 		self.canvas.delete('inputnums')
-		print(self.board)
 
 	def show_focus(self, x ,y):
 		self.selected = None
@@ -191,13 +185,10 @@ class play_board(object):
 			return
 		x, y = self.selected
 		self.board[y][x] = event.char
-		print(self.board)
-		print(self.board[x][y])
 		text = event.char
 		if text == '0': 
 			text = ' '
 		tag = 'l{}{}'.format(x,y)
-		print(tag)
 		self.canvas.delete(str(tag))
 		self.canvas.create_text(xcoordinate.get(x), ycoordinate.get(y), text=text, fill='green', font=self.font, anchor=CENTER, tags=(str(tag), 'inputnums'))
 		return
@@ -206,8 +197,8 @@ class play_board(object):
 		STRING = r''''up','down','left','right': Moves the chosen grid up, down, left or right to the closest avaliable grid
 'r': Restart the board and clear all settings
 'q': Quits program
-'h': User help
-		'''
+'h': User help'''
+		messagebox.showinfo('Seems like you need help', STRING)
 
 
 

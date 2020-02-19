@@ -5,3 +5,4 @@ exe/.DS_Store
 build
 dist
 exe/todo
+.eggs

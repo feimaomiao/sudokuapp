@@ -12,7 +12,7 @@ OPTIONS = {
 	'argv_emulation': True,
 	'includes':['tkinter', 'os','copy','time','random','errno','signal','functools'],
 	'packages': ['exe','PIL'],
-	# 'excludes': ['PyQt5']
+	'compressed': True
 }
 
 setup(
